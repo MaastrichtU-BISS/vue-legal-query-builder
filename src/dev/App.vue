@@ -26,11 +26,16 @@ console.log('API Client initialized with proxy')
 const handleFormSubmit = async (formData: QueryParameters) => {
   console.log('Form submitted with parameters:', formData)
   try {
+
+    // get documents from API
     const documents = await client.fetchDocuments({
       query: formData
     })
+
+    // get full text for each document
+    const documentsWithFullText = await client.getFullText(documents.map((doc) => doc.id))
     
-    return documents
+    return documentsWithFullText
   } catch (error) {
     console.error('Error fetching documents:', error)
     throw error

@@ -96,6 +96,11 @@ export interface LegalDocument {
   metadata?: Record<string, any>;
 }
 
+export interface FullTextDocument {
+  id: string;
+  fullText: string;
+}
+
 export interface LegalDocsClientConfig {
   baseURL?: string;
   apiKey?: string;

@@ -1,4 +1,4 @@
-import { LegalDocument, LegalDocumentNetwork, LegalDocumentQuery, LegalDocsClientConfig } from "../types";
+import { LegalDocument, LegalDocumentNetwork, LegalDocumentQuery, LegalDocsClientConfig, FullTextDocument } from "../types";
 import axios, { AxiosInstance } from "axios";
 
 export class LegalDocsClient {
@@ -52,11 +52,26 @@ export class LegalDocsClient {
         "/network",
         {
           arguments: { ...query.query },
-
-          endpoint: "api/network",
         },
       );
       return response.data.nodes;
+    } catch (error: any) {
+      throw new Error(`Failed to fetch documents: ${error.message}`);
+    }
+  }
+
+    /**
+   * Fetch Full Text documents based on query parameters
+   */
+  async getFullText(eclis: string[]): Promise<FullTextDocument[]> {
+    try {
+      const response = await this.client.post<FullTextDocument[]>(
+        "/network/text",
+        {
+          ecli: eclis,
+        },
+      );
+      return response.data;
     } catch (error: any) {
       throw new Error(`Failed to fetch documents: ${error.message}`);
     }
