@@ -1,14 +1,14 @@
 {
-  "name": "legal-docs-fetcher",
+  "name": "vue-legal-query-builder",
   "version": "0.1.0",
-  "description": "A Vue component library with form and API client for fetching legal documents",
-  "main": "./dist/legal-docs-fetcher.umd.js",
-  "module": "./dist/legal-docs-fetcher.es.js",
+  "description": "A Vue 3 component for building legal document search queries with hierarchical filtering options",
+  "main": "./dist/vue-legal-query-builder.umd.js",
+  "module": "./dist/vue-legal-query-builder.es.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/legal-docs-fetcher.es.js",
-      "require": "./dist/legal-docs-fetcher.umd.js",
+      "import": "./dist/vue-legal-query-builder.es.js",
+      "require": "./dist/vue-legal-query-builder.umd.js",
       "types": "./dist/index.d.ts"
     },
     "./style.css": "./dist/style.css"
@@ -28,18 +28,20 @@
     "component",
     "legal",
     "documents",
+    "query",
+    "builder",
     "form",
-    "api-client"
+    "search"
   ],
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MaastrichtU-BISS/legal-docs-fetcher.git"
+    "url": "git+https://github.com/MaastrichtU-BISS/vue-legal-query-builder.git"
   },
-  "homepage": "https://github.com/MaastrichtU-BISS/legal-docs-fetcher#readme",
+  "homepage": "https://github.com/MaastrichtU-BISS/vue-legal-query-builder#readme",
   "bugs": {
-    "url": "https://github.com/MaastrichtU-BISS/legal-docs-fetcher/issues"
+    "url": "https://github.com/MaastrichtU-BISS/vue-legal-query-builder/issues"
   },
   "peerDependencies": {
     "vue": "^3.4.0"

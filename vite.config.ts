@@ -10,8 +10,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'LegalDocsFetcher',
-      fileName: (format: string) => `legal-docs-fetcher.${format}.js`
+      name: 'VueLegalQueryBuilder',
+      fileName: (format: string) => `vue-legal-query-builder.${format}.js`
     },
     rollupOptions: {
       external: ['vue'],
