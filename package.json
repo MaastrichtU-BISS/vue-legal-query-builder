@@ -1,6 +1,6 @@
 {
   "name": "vue-legal-query-builder",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Vue 3 component for building legal document search queries with hierarchical filtering options",
   "main": "./dist/vue-legal-query-builder.umd.js",
   "module": "./dist/vue-legal-query-builder.es.js",
