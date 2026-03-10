@@ -46,7 +46,7 @@
                 </div>
 
                 <!-- Rechtspraak-specific: Law References -->
-                <div v-if="formData.selectedDataset === DataSource.RS" class="form-group">
+                <div v-if="false && formData.selectedDataset === DataSource.RS" class="form-group">
                     <div class="label-with-toggle">
                         <label>Law References</label>
                         <button type="button" @click="formData.selectedLawsIntersect = !formData.selectedLawsIntersect"
