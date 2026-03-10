@@ -11,7 +11,6 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "preserve",
 
     /* Linting */
@@ -22,8 +21,7 @@
 
     /* Type declarations */
     "declaration": true,
-    "declarationDir": "./dist",
-    "emitDeclarationOnly": false
+    "declarationDir": "./dist"
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
   "exclude": ["node_modules", "dist"]
