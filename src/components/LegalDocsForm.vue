@@ -134,11 +134,23 @@
                     </div>
                 </div>
 
-                <!-- Domains (Rechtspraak only - simplified) -->
+                <!-- Domains (Rechtspraak only - hierarchical checkboxes) -->
                 <div v-if="formData.selectedDataset === DataSource.RS" class="form-group">
-                    <label for="domains">Domains (comma-separated)</label>
-                    <input id="domains" v-model="formData.domains" type="text"
-                        placeholder="e.g., Bestuursrecht, Civiel recht" />
+                    <button type="button" @click="showDomains = !showDomains" class="toggle-advanced">
+                        {{ showDomains ? '▼' : '▶' }} Domains
+                    </button>
+                    <div v-if="showDomains" class="hierarchical-checkboxes">
+                        <div v-for="domain in domains" :key="domain.value" class="hierarchy-level" :style="{ marginLeft: domain.level * 20 + 'px' }">
+                            <label class="checkbox-label">
+                                <input 
+                                    type="checkbox" 
+                                    :checked="formData.selectedDomains.includes(domain.value)"
+                                    @change="toggleDomain(domain.value, domain.children || [])"
+                                />
+                                {{ domain.label }}
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Advanced Settings Toggle -->
@@ -253,7 +265,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import type { QueryParameters } from 'legal-docs-client'
-import { DataSource, DocType, DUTCH_COURT_INSTANCES } from 'legal-docs-client'
+import { DataSource, DocType, INSTANCES_OPTIONS, DOMAINS_OPTIONS } from 'legal-docs-client'
 
 
 export interface LegalDocsFormProps {
@@ -272,20 +284,20 @@ const emit = defineEmits<{
     error: [error: Error]
 }>()
 
-// Build hierarchical instances from DUTCH_COURT_INSTANCES
-interface InstanceNode {
+// Build hierarchical instances from INSTANCES_OPTIONS
+interface OptionNode {
     value: string
     label: string
     level: number
     children?: string[]
 }
 
-const buildInstanceHierarchy = (): InstanceNode[] => {
-    const nodes: InstanceNode[] = []
+const buildHierarchy = (options: any[]): OptionNode[] => {
+    const nodes: OptionNode[] = []
     
-    // Convert DUTCH_COURT_INSTANCES to InstanceNode array
-    if (Array.isArray(DUTCH_COURT_INSTANCES)) {
-        const items = DUTCH_COURT_INSTANCES as any[]
+    // Convert options to OptionNode array
+    if (Array.isArray(options)) {
+        const items = options as any[]
         items.forEach((item) => {
             let value: string
             let label: string
@@ -304,9 +316,11 @@ const buildInstanceHierarchy = (): InstanceNode[] => {
                     label = anyItem.name
                     level = anyItem.level || 0
                     if (anyItem.children && Array.isArray(anyItem.children)) {
-                        children = anyItem.children.map((child: any) => 
-                            typeof child === 'string' ? child : (child.name || child.value || String(child))
-                        )
+                        children = anyItem.children.map((child: any, index: number) => {
+                            // Use unique ID combining parent and index to avoid ambiguity with duplicate child names
+                            const childValue = typeof child === 'string' ? child : (child.name || child.value || String(child))
+                            return `${value}__${index}__${childValue}`
+                        })
                     }
                 } else {
                     // Try to use first property as key
@@ -317,9 +331,11 @@ const buildInstanceHierarchy = (): InstanceNode[] => {
                         label = key
                         const childData = anyItem[key]
                         if (Array.isArray(childData)) {
-                            children = childData.map((child: any) => 
-                                typeof child === 'string' ? child : (child.name || child.value || String(child))
-                            )
+                            children = childData.map((child: any, index: number) => {
+                                // Use unique ID combining parent and index to avoid ambiguity
+                                const childValue = typeof child === 'string' ? child : (child.name || child.value || String(child))
+                                return `${key}__${index}__${childValue}`
+                            })
                         }
                     } else {
                         return
@@ -329,14 +345,16 @@ const buildInstanceHierarchy = (): InstanceNode[] => {
                 return
             }
             
-            const node: InstanceNode = { value, label, level, ...(children && { children }) }
+            const node: OptionNode = { value, label, level, ...(children && { children }) }
             nodes.push(node)
             
             // Add child nodes
             if (children) {
-                children.forEach(childValue => {
-                    if (!nodes.find(n => n.value === childValue)) {
-                        nodes.push({ value: childValue, label: childValue, level: level + 1 })
+                children.forEach((childId) => {
+                    if (!nodes.find(n => n.value === childId)) {
+                        // Extract the display label from the unique ID (last part)
+                        const childLabel = childId.split('__').pop() || childId
+                        nodes.push({ value: childId, label: childLabel, level: level + 1 })
                     }
                 })
             }
@@ -346,7 +364,8 @@ const buildInstanceHierarchy = (): InstanceNode[] => {
     return nodes.length > 0 ? nodes : []
 }
 
-const instances = buildInstanceHierarchy()
+const instances = buildHierarchy(INSTANCES_OPTIONS)
+const domains = buildHierarchy(DOMAINS_OPTIONS)
 
 // Form data
 const formData = reactive({
@@ -356,7 +375,7 @@ const formData = reactive({
     articles: '',
     selectedLawsIntersect: true,
     selectedInstances: [] as string[],
-    domains: '',
+    selectedDomains: [] as string[],
     degreesSource: 0,
     degreesTarget: 0,
     dateStart: '1900-01-01',
@@ -382,6 +401,7 @@ const formData = reactive({
 const currentKeyword = ref('')
 const showAdvanced = ref(false)
 const showInstances = ref(false)
+const showDomains = ref(false)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
@@ -445,6 +465,29 @@ function toggleInstance(instanceValue: string, childValues: string[]) {
     }
 }
 
+function toggleDomain(domainValue: string, childValues: string[]) {
+    const index = formData.selectedDomains.indexOf(domainValue)
+    
+    if (index > -1) {
+        // Unchecking parent - remove parent and all children
+        formData.selectedDomains.splice(index, 1)
+        childValues.forEach(childValue => {
+            const childIndex = formData.selectedDomains.indexOf(childValue)
+            if (childIndex > -1) {
+                formData.selectedDomains.splice(childIndex, 1)
+            }
+        })
+    } else {
+        // Checking parent - add parent and all children
+        formData.selectedDomains.push(domainValue)
+        childValues.forEach(childValue => {
+            if (!formData.selectedDomains.includes(childValue)) {
+                formData.selectedDomains.push(childValue)
+            }
+        })
+    }
+}
+
 // Parse form data to QueryParameters
 function parseParameters(): QueryParameters {
     const doctypes: DocType[] = []
@@ -485,12 +528,12 @@ function parseParameters(): QueryParameters {
     }
 
     // Parse Domains
-    if (formData.domains) {
-        const domainsArray = formData.domains
-            .split(',')
-            .map(i => i.trim())
-            .filter(i => i.length > 0)
-        if (domainsArray.length > 0) params.domains = domainsArray
+    if (formData.selectedDomains.length > 0) {
+        // Flatten selected domains to their values
+        const domainValues = formData.selectedDomains
+            .map(id => domains.find(d => d.value === id)?.value)
+            .filter((value): value is string => value !== undefined)
+        if (domainValues.length > 0) params.domains = domainValues
     }
 
     // ECHR-specific fields
@@ -566,7 +609,7 @@ const handleReset = () => {
     formData.articles = ''
     formData.selectedLawsIntersect = true
     formData.selectedInstances = []
-    formData.domains = ''
+    formData.selectedDomains = []
     formData.degreesSource = 0
     formData.degreesTarget = 0
     formData.dateStart = '1900-01-01'
@@ -589,6 +632,7 @@ const handleReset = () => {
     currentKeyword.value = ''
     showAdvanced.value = false
     showInstances.value = false
+    showDomains.value = false
     error.value = null
     successMessage.value = null
 }
