@@ -115,11 +115,23 @@
                     </div>
                 </template>
 
-                <!-- Instances (Rechtspraak only - simplified) -->
+                <!-- Instances (Rechtspraak only - hierarchical checkboxes) -->
                 <div v-if="formData.selectedDataset === DataSource.RS" class="form-group">
-                    <label for="instances">Instances (comma-separated)</label>
-                    <input id="instances" v-model="formData.instances" type="text"
-                        placeholder="e.g., Hoge Raad, Raad van State" />
+                    <button type="button" @click="showInstances = !showInstances" class="toggle-advanced">
+                        {{ showInstances ? '▼' : '▶' }} Instances
+                    </button>
+                    <div v-if="showInstances" class="hierarchical-checkboxes">
+                        <div v-for="instance in instances" :key="instance.value" class="hierarchy-level" :style="{ marginLeft: instance.level * 20 + 'px' }">
+                            <label class="checkbox-label">
+                                <input 
+                                    type="checkbox" 
+                                    :checked="formData.selectedInstances.includes(instance.value)"
+                                    @change="toggleInstance(instance.value, instance.children || [])"
+                                />
+                                {{ instance.label }}
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Domains (Rechtspraak only - simplified) -->
@@ -241,7 +253,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import type { QueryParameters } from 'legal-docs-client'
-import { DataSource, DocType } from 'legal-docs-client'
+import { DataSource, DocType, DUTCH_COURT_INSTANCES } from 'legal-docs-client'
 
 
 export interface LegalDocsFormProps {
@@ -260,6 +272,82 @@ const emit = defineEmits<{
     error: [error: Error]
 }>()
 
+// Build hierarchical instances from DUTCH_COURT_INSTANCES
+interface InstanceNode {
+    value: string
+    label: string
+    level: number
+    children?: string[]
+}
+
+const buildInstanceHierarchy = (): InstanceNode[] => {
+    const nodes: InstanceNode[] = []
+    
+    // Convert DUTCH_COURT_INSTANCES to InstanceNode array
+    if (Array.isArray(DUTCH_COURT_INSTANCES)) {
+        const items = DUTCH_COURT_INSTANCES as any[]
+        items.forEach((item) => {
+            let value: string
+            let label: string
+            let level: number = 0
+            let children: string[] | undefined = undefined
+            
+            if (typeof item === 'string') {
+                // Simple string entry
+                value = item
+                label = item
+            } else if (typeof item === 'object' && item !== null) {
+                // Object entry
+                const anyItem = item as any
+                if (anyItem.name) {
+                    value = anyItem.name
+                    label = anyItem.name
+                    level = anyItem.level || 0
+                    if (anyItem.children && Array.isArray(anyItem.children)) {
+                        children = anyItem.children.map((child: any) => 
+                            typeof child === 'string' ? child : (child.name || child.value || String(child))
+                        )
+                    }
+                } else {
+                    // Try to use first property as key
+                    const keys = Object.keys(anyItem)
+                    if (keys.length > 0) {
+                        const key = keys[0]
+                        value = key
+                        label = key
+                        const childData = anyItem[key]
+                        if (Array.isArray(childData)) {
+                            children = childData.map((child: any) => 
+                                typeof child === 'string' ? child : (child.name || child.value || String(child))
+                            )
+                        }
+                    } else {
+                        return
+                    }
+                }
+            } else {
+                return
+            }
+            
+            const node: InstanceNode = { value, label, level, ...(children && { children }) }
+            nodes.push(node)
+            
+            // Add child nodes
+            if (children) {
+                children.forEach(childValue => {
+                    if (!nodes.find(n => n.value === childValue)) {
+                        nodes.push({ value: childValue, label: childValue, level: level + 1 })
+                    }
+                })
+            }
+        })
+    }
+    
+    return nodes.length > 0 ? nodes : []
+}
+
+const instances = buildInstanceHierarchy()
+
 // Form data
 const formData = reactive({
     selectedDataset: DataSource.RS,
@@ -267,7 +355,7 @@ const formData = reactive({
     eclis: '',
     articles: '',
     selectedLawsIntersect: true,
-    instances: '',
+    selectedInstances: [] as string[],
     domains: '',
     degreesSource: 0,
     degreesTarget: 0,
@@ -293,6 +381,7 @@ const formData = reactive({
 
 const currentKeyword = ref('')
 const showAdvanced = ref(false)
+const showInstances = ref(false)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
@@ -333,6 +422,29 @@ function toggleImportance(level: number) {
     }
 }
 
+function toggleInstance(instanceValue: string, childValues: string[]) {
+    const index = formData.selectedInstances.indexOf(instanceValue)
+    
+    if (index > -1) {
+        // Unchecking parent - remove parent and all children
+        formData.selectedInstances.splice(index, 1)
+        childValues.forEach(childValue => {
+            const childIndex = formData.selectedInstances.indexOf(childValue)
+            if (childIndex > -1) {
+                formData.selectedInstances.splice(childIndex, 1)
+            }
+        })
+    } else {
+        // Checking parent - add parent and all children
+        formData.selectedInstances.push(instanceValue)
+        childValues.forEach(childValue => {
+            if (!formData.selectedInstances.includes(childValue)) {
+                formData.selectedInstances.push(childValue)
+            }
+        })
+    }
+}
+
 // Parse form data to QueryParameters
 function parseParameters(): QueryParameters {
     const doctypes: DocType[] = []
@@ -364,12 +476,12 @@ function parseParameters(): QueryParameters {
     }
 
     // Parse Instances
-    if (formData.instances) {
-        const instancesArray = formData.instances
-            .split(',')
-            .map(i => i.trim())
-            .filter(i => i.length > 0)
-        if (instancesArray.length > 0) params.instances = instancesArray
+    if (formData.selectedInstances.length > 0) {
+        // Flatten selected instances to their values
+        const instanceValues = formData.selectedInstances
+            .map(id => instances.find(inst => inst.value === id)?.value)
+            .filter((value): value is string => value !== undefined)
+        if (instanceValues.length > 0) params.instances = instanceValues
     }
 
     // Parse Domains
@@ -453,7 +565,7 @@ const handleReset = () => {
     formData.eclis = ''
     formData.articles = ''
     formData.selectedLawsIntersect = true
-    formData.instances = ''
+    formData.selectedInstances = []
     formData.domains = ''
     formData.degreesSource = 0
     formData.degreesTarget = 0
@@ -476,6 +588,7 @@ const handleReset = () => {
     formData.importance = []
     currentKeyword.value = ''
     showAdvanced.value = false
+    showInstances.value = false
     error.value = null
     successMessage.value = null
 }
@@ -683,6 +796,32 @@ const handleReset = () => {
 .checkbox-label input[type="checkbox"] {
     width: auto;
     cursor: pointer;
+}
+
+/* Hierarchical Checkboxes */
+.hierarchical-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.hierarchical-checkboxes:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.hierarchy-level {
+    transition: background-color 0.2s;
+}
+
+.hierarchy-level .checkbox-label {
+    gap: 8px;
+    padding: 4px 0;
 }
 
 /* Toggle Advanced Button */
