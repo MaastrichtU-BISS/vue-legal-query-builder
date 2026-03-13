@@ -1,9 +1,15 @@
 import type { App, Plugin } from 'vue'
 import LegalDocsForm from './components/LegalDocsForm.vue'
 
-// Re-export everything from legal-docs-client dependency
-export * from 'legal-docs-client'
+// Import and re-export all types from legal-docs-client
 export type * from 'legal-docs-client'
+
+// Import and re-export all runtime exports from legal-docs-client
+export * from 'legal-docs-client'
+
+// Explicitly import and re-export key exports
+import { createLegalDocsClient as createClient } from 'legal-docs-client'
+export const createLegalDocsClient = createClient
 
 // Export components
 export { LegalDocsForm }
