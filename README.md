@@ -48,25 +48,7 @@ const onError = (error) => {
 
 ### Accessing Legal Documents Client Functions
 
-Since `vue-legal-query-builder` re-exports the entire `legal-docs-client` dependency, you only need to install `vue-legal-query-builder` to access both the form component and the client:
-
-```javascript
-import { 
-  createLegalDocsClient,      // Create client instances
-  QueryParameters,             // Type definitions
-  DataSource,                  // Dataset enums
-  DocType,                     // Document type enums
-  INSTANCES_OPTIONS,           // Hierarchical instances data
-  DOMAINS_OPTIONS              // Hierarchical domains data
-} from 'vue-legal-query-builder'
-
-// Create a client
-const client = createLegalDocsClient()
-
-// Use instances and domains data directly
-console.log(INSTANCES_OPTIONS)
-console.log(DOMAINS_OPTIONS)
-```
+Since `vue-legal-query-builder` re-exports the entire `legal-docs-client` dependency, you only need to install `vue-legal-query-builder` to access both the form component and the client.
 
 ## Props
 
@@ -87,10 +69,6 @@ console.log(DOMAINS_OPTIONS)
 ## Requirements
 
 - Vue 3.4 or higher
-
-## Note on Dependencies
-
-This package bundles and re-exports the entire [`legal-docs-client`](https://www.npmjs.com/package/legal-docs-client) library. You only need to install `vue-legal-query-builder` to access both the form component and all client functions. The `legal-docs-client` dependency is included and fully integrated, so there's no need to install it separately.
 
 ## License
 
