@@ -46,9 +46,11 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "peerDependencies": {
-    "vue": "^3.4.0",
+  "dependencies": {
     "legal-docs-client": "^0.1.1"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.0"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
