@@ -43,6 +43,9 @@
   "bugs": {
     "url": "https://github.com/MaastrichtU-BISS/vue-legal-query-builder/issues"
   },
+  "publishConfig": {
+    "registry": "https://www.npmjs.com/package/legal-docs-client"
+  },
   "peerDependencies": {
     "vue": "^3.4.0"
   },
