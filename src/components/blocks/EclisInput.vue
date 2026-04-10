@@ -1,0 +1,44 @@
+<template>
+    <div class="form-group">
+        <label for="eclis">ECLIs <span class="required-asterisk">*</span> (comma-separated)</label>
+        <input id="eclis" v-model="eclis"
+            type="text" placeholder="e.g., ECLI:NL:HR:2020:123, ECLI:NL:HR:2020:456" />
+    </div>
+</template>
+
+<script setup lang="ts">
+const eclis = defineModel<string>('eclis')
+</script>
+
+<style scoped>
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+label {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.required-asterisk {
+    color: #ef4444;
+}
+</style>
