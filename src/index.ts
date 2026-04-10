@@ -1,5 +1,9 @@
 import type { App, Plugin } from "vue";
+
+// Export components
 import LegalDocsForm from "./components/LegalDocsForm.vue";
+export { LegalDocsForm };
+export type { LegalDocsFormProps } from "./components/types";
 
 // Explicitly import and re-export types from legal-docs-client
 import type {
@@ -20,12 +24,6 @@ export type {
 // Explicitly import and re-export key exports
 import { createLegalDocsClient } from "legal-docs-client";
 export { createLegalDocsClient };
-
-// Export components
-export { LegalDocsForm };
-
-// Export component types
-export type { LegalDocsFormProps } from "./components/types";
 
 // Vue plugin for registering components globally
 export const VueLegalQueryBuilderPlugin: Plugin = {
