@@ -97,8 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, defineAsyncComponent } from 'vue'
-import { DataSource, DocType } from 'legal-docs-client'
+import { ref, computed, defineAsyncComponent } from 'vue'
 import { ArrowLeft, ArrowRight } from 'lucide-vue-next'
 import type { GuidedStructure, Step, Goal } from '../types'
 import { BlockType } from '../types'
@@ -118,12 +117,13 @@ import ImportanceLevelSelector from '../blocks/ImportanceLevelSelector.vue'
 
 interface Props {
     guidedStructure?: GuidedStructure
+    formData: any
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-    'submit': [formData: any]
+    'submit': []
 }>()
 
 const getIconComponent = (iconName: string) => {
@@ -139,36 +139,6 @@ const getIconComponent = (iconName: string) => {
 // State management
 const selectedGoalIndex = ref<number | null>(null)
 const currentStepIndex = ref(0)
-
-const formData = reactive({
-    selectedDataset: DataSource.RS,
-    keywords: [] as string[],
-    eclis: '',
-    articles: '',
-    selectedLawsIntersect: true,
-    selectedInstances: [] as string[],
-    selectedDomains: [] as string[],
-    degreesSource: 0,
-    degreesTarget: 0,
-    dateStart: '1900-01-01',
-    dateEnd: new Date().toISOString().split('T')[0],
-    decisions: true,
-    opinions: false,
-    engine: 'ES',
-    attributesToFetch: 'ALL',
-    articleViolatedInput: '',
-    articleAppliedInput: '',
-    articleNonViolatedInput: '',
-    articleViolatedIntersect: false,
-    articleAppliedIntersect: false,
-    articleNonViolatedIntersect: false,
-    articleGlobalIntersect: false,
-    applicationNumber: '',
-    respondentStateInput: '',
-    languageInput: '',
-    importance: [] as number[],
-    currentKeyword: ''
-})
 
 // Computed properties
 const currentGoal = computed((): Goal | undefined => {
@@ -205,7 +175,7 @@ const nextStep = () => {
 }
 
 const submitGoal = () => {
-    emit('submit', formData)
+    emit('submit')
 }
 
 const getBlockComponent = (blockType: BlockType) => {
@@ -234,80 +204,80 @@ const getBlockProps = (step: Step): any => {
                 ...baseProps,
                 label: step.title,
                 fieldName: 'articleField',
-                modelValue: formData.articleViolatedInput,
-                'onUpdate:modelValue': (val: string) => { formData.articleViolatedInput = val },
+                modelValue: props.formData.articleViolatedInput,
+                'onUpdate:modelValue': (val: string) => { props.formData.articleViolatedInput = val },
                 placeholder: step.placeholder
             }
 
         case BlockType.DATASET_SELECTOR:
             return {
                 ...baseProps,
-                selectedDataset: formData.selectedDataset,
-                'onUpdate:selectedDataset': (val: string) => { formData.selectedDataset = val }
+                selectedDataset: props.formData.selectedDataset,
+                'onUpdate:selectedDataset': (val: string) => { props.formData.selectedDataset = val }
             }
 
         case BlockType.DATE_RANGE:
             return {
                 ...baseProps,
-                dateStart: formData.dateStart,
-                'onUpdate:dateStart': (val: string) => { formData.dateStart = val },
-                dateEnd: formData.dateEnd,
-                'onUpdate:dateEnd': (val: string) => { formData.dateEnd = val }
+                dateStart: props.formData.dateStart,
+                'onUpdate:dateStart': (val: string) => { props.formData.dateStart = val },
+                dateEnd: props.formData.dateEnd,
+                'onUpdate:dateEnd': (val: string) => { props.formData.dateEnd = val }
             }
 
         case BlockType.DOC_TYPE_SELECTOR:
             return {
                 ...baseProps,
-                decisions: formData.decisions,
-                'onUpdate:decisions': (val: boolean) => { formData.decisions = val },
-                opinions: formData.opinions,
-                'onUpdate:opinions': (val: boolean) => { formData.opinions = val }
+                decisions: props.formData.decisions,
+                'onUpdate:decisions': (val: boolean) => { props.formData.decisions = val },
+                opinions: props.formData.opinions,
+                'onUpdate:opinions': (val: boolean) => { props.formData.opinions = val }
             }
 
         case BlockType.DOMAINS_SELECTOR:
             return {
                 ...baseProps,
-                selectedValues: formData.selectedDomains,
-                'onUpdate:selectedValues': (val: string[]) => { formData.selectedDomains = val }
+                selectedValues: props.formData.selectedDomains,
+                'onUpdate:selectedValues': (val: string[]) => { props.formData.selectedDomains = val }
             }
 
         case BlockType.ECLIS_INPUT:
             return {
                 ...baseProps,
-                eclis: formData.eclis,
-                'onUpdate:eclis': (val: string) => { formData.eclis = val }
+                eclis: props.formData.eclis,
+                'onUpdate:eclis': (val: string) => { props.formData.eclis = val }
             }
 
         case BlockType.IMPORTANCE_LEVEL_SELECTOR:
             return {
                 ...baseProps,
-                importance: formData.importance,
-                'onUpdate:importance': (val: number[]) => { formData.importance = val }
+                importance: props.formData.importance,
+                'onUpdate:importance': (val: number[]) => { props.formData.importance = val }
             }
 
         case BlockType.INSTANCES_SELECTOR:
             return {
                 ...baseProps,
-                selectedValues: formData.selectedInstances,
-                'onUpdate:selectedValues': (val: string[]) => { formData.selectedInstances = val }
+                selectedValues: props.formData.selectedInstances,
+                'onUpdate:selectedValues': (val: string[]) => { props.formData.selectedInstances = val }
             }
 
         case BlockType.KEYWORDS_INPUT:
             return {
                 ...baseProps,
-                keywords: formData.keywords,
-                'onUpdate:keywords': (val: string[]) => { formData.keywords = val },
-                currentKeyword: formData.currentKeyword,
-                'onUpdate:currentKeyword': (val: string) => { formData.currentKeyword = val }
+                keywords: props.formData.keywords,
+                'onUpdate:keywords': (val: string[]) => { props.formData.keywords = val },
+                currentKeyword: props.formData.currentKeyword,
+                'onUpdate:currentKeyword': (val: string) => { props.formData.currentKeyword = val }
             }
 
         case BlockType.NETWORK_DEGREES:
             return {
                 ...baseProps,
-                degreesSource: formData.degreesSource,
-                'onUpdate:degreesSource': (val: number) => { formData.degreesSource = val },
-                degreesTarget: formData.degreesTarget,
-                'onUpdate:degreesTarget': (val: number) => { formData.degreesTarget = val }
+                degreesSource: props.formData.degreesSource,
+                'onUpdate:degreesSource': (val: number) => { props.formData.degreesSource = val },
+                degreesTarget: props.formData.degreesTarget,
+                'onUpdate:degreesTarget': (val: number) => { props.formData.degreesTarget = val }
             }
 
         case BlockType.TEXT_INPUT:
@@ -315,8 +285,8 @@ const getBlockProps = (step: Step): any => {
                 ...baseProps,
                 label: step.title,
                 fieldId: step.title.toLowerCase().replace(/\s+/g, '-'),
-                value: formData.articleViolatedInput,
-                'onUpdate:value': (val: string) => { formData.articleViolatedInput = val },
+                value: props.formData.articleViolatedInput,
+                'onUpdate:value': (val: string) => { props.formData.articleViolatedInput = val },
                 placeholder: step.placeholder
             }
 

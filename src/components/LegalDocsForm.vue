@@ -14,6 +14,7 @@
         <GuidedForm 
             v-else-if="props.type === FormType.GUIDED"
             :guidedStructure="props.guidedStructure"
+            :formData="formData"
             @submit="handleSubmit"
         />
     </div>
