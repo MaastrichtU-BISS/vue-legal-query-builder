@@ -344,7 +344,8 @@ const getBlockProps = (step: Step): any => {
     font-size: 20px;
     font-weight: 600;
     color: #243056;
-    margin-bottom: 16px;
+    margin-top: 10px;
+    margin-bottom: 0;
 }
 
 .goals-grid {
@@ -386,7 +387,7 @@ const getBlockProps = (step: Step): any => {
 .goal-description {
     font-size: 14px;
     color: #666;
-    margin-bottom: 12px;
+    margin: 0;
     line-height: 1.5;
 }
 
