@@ -139,22 +139,11 @@
             <div class="spinner"></div>
             <p class="loader-text">Searching documents...</p>
         </div>
+        <!-- Warning Message -->
+        <div v-if="formData.keywords.length === 0 && !formData.eclis.trim()" class="warning-message">
+            <strong>*</strong> Required: Please enter either keywords or ECLIs to search
+        </div>
     </form>
-
-    <!-- Success Message -->
-    <div v-if="successMessage" class="success-message">
-        {{ successMessage }}
-    </div>
-
-    <!-- Error Message -->
-    <div v-if="error" class="error-message">
-        {{ error }}
-    </div>
-
-    <!-- Warning Message -->
-    <div v-if="formData.keywords.length === 0 && !formData.eclis.trim()" class="warning-message">
-        <strong>*</strong> Required: Please enter either keywords or ECLIs to search
-    </div>
 </template>
 
 <script setup lang="ts">
@@ -174,8 +163,6 @@ import ImportanceLevelSelector from '../blocks/ImportanceLevelSelector.vue'
 
 const props = defineProps<{
     formData: any
-    error: string | null
-    successMessage: string | null
     loading: boolean
 }>()
 
@@ -316,26 +303,6 @@ const handleSubmit = () => emit('submit')
     color: #666;
     margin: 8px 0 0 0;
     font-style: italic;
-}
-
-.success-message {
-    padding: 12px 16px;
-    background: #dcfce7;
-    border-left: 4px solid #22c55e;
-    color: #15803d;
-    border-radius: 4px;
-    margin-top: 16px;
-    font-size: 14px;
-}
-
-.error-message {
-    padding: 12px 16px;
-    background: #fee2e2;
-    border-left: 4px solid #ef4444;
-    color: #b91c1c;
-    border-radius: 4px;
-    margin-top: 16px;
-    font-size: 14px;
 }
 
 .warning-message {

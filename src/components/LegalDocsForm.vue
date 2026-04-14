@@ -5,8 +5,6 @@
         <FreeForm 
             v-if="props.type === FormType.FREE"
             :formData="formData"
-            :error="error"
-            :successMessage="successMessage"
             :loading="loading"
             @submit="handleSubmit"
             @handleReset="handleReset"
@@ -17,6 +15,16 @@
             :formData="formData"
             @submit="handleSubmit"
         />
+
+        <!-- Success Message -->
+        <div v-if="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+
+        <!-- Error Message -->
+        <div v-if="error" class="error-message">
+            {{ error }}
+        </div>
     </div>
 </template>
 
