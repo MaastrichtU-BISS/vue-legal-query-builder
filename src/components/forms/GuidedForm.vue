@@ -83,7 +83,7 @@
                         @click="submitGoal" 
                         class="btn btn-primary"
                     >
-                        Submit Goal
+                        Submit
                     </button>
                 </div>
             </div>
