@@ -40,6 +40,8 @@
                             active: index === currentStepIndex,
                             completed: index < currentStepIndex
                         }"
+                        @click="!props.loading && jumpToStep(index)"
+                        :style="{ cursor: props.loading ? 'not-allowed' : 'pointer' }"
                     >
                         <div class="step-number">
                             {{ index < currentStepIndex ? '✓' : index + 1 }}
@@ -174,6 +176,13 @@ const nextStep = () => {
     if (!currentGoal.value) return
     if (currentStepIndex.value < currentGoal.value.steps.length - 1) {
         currentStepIndex.value++
+    }
+}
+
+const jumpToStep = (index: number) => {
+    if (!currentGoal.value) return
+    if (index >= 0 && index < currentGoal.value.steps.length) {
+        currentStepIndex.value = index
     }
 }
 
@@ -416,6 +425,11 @@ const getBlockProps = (step: Step): any => {
     min-width: 80px;
     opacity: 0.5;
     transition: all 0.3s;
+    user-select: none;
+}
+
+.step-indicator:hover {
+    opacity: 0.7;
 }
 
 .step-indicator.active {
