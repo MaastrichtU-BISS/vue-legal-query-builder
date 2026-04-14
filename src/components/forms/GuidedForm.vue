@@ -331,6 +331,7 @@ const getBlockProps = (step: Step): any => {
     cursor: pointer;
     transition: all 0.3s ease;
     background: white;
+    max-width: 320px;
 }
 
 .goal-card:hover {
@@ -342,9 +343,10 @@ const getBlockProps = (step: Step): any => {
 .goal-icon {
     width: 48px;
     height: 48px;
-    margin-bottom: 12px;
+    margin: 0 auto 12px;
     color: #3b82f6;
     stroke-width: 1.5;
+    display: block;
 }
 
 .goal-title {
@@ -352,6 +354,7 @@ const getBlockProps = (step: Step): any => {
     font-weight: 600;
     color: #243056;
     margin-bottom: 8px;
+    margin-top: 0;
 }
 
 .goal-description {
