@@ -244,7 +244,6 @@ const clearMessages = () => {
 
 <style scoped>
 .legal-docs-form {
-    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
     font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;

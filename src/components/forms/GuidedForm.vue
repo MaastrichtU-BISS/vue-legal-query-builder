@@ -327,7 +327,6 @@ const getBlockProps = (block: Block): any => {
 
 <style scoped>
 .guided-form-container {
-    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -350,7 +349,7 @@ const getBlockProps = (block: Block): any => {
 .goals-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 16px;
+    gap: 8px;
 }
 
 .goal-card {
@@ -361,6 +360,7 @@ const getBlockProps = (block: Block): any => {
     transition: all 0.3s ease;
     background: white;
     max-width: 320px;
+    justify-self: center;
 }
 
 .goal-card:hover {
