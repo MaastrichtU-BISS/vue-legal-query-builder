@@ -114,6 +114,7 @@ import KeywordsInput from '../blocks/KeywordsInput.vue'
 import EclisInput from '../blocks/EclisInput.vue'
 import ArticleField from '../blocks/ArticleField.vue'
 import TextInput from '../blocks/TextInput.vue'
+import TextAreaInput from '../blocks/TextAreaInput.vue'
 import DateRange from '../blocks/DateRange.vue'
 import NetworkDegrees from '../blocks/NetworkDegrees.vue'
 import InstancesSelector from '../blocks/InstancesSelector.vue'
@@ -208,6 +209,7 @@ const getBlockComponent = (blockType: BlockType) => {
         [BlockType.KEYWORDS_INPUT]: KeywordsInput,
         [BlockType.NETWORK_DEGREES]: NetworkDegrees,
         [BlockType.TEXT_INPUT]: TextInput,
+        [BlockType.TEXTAREA_INPUT]: TextAreaInput,
     }
     return componentMap[blockType]
 }
@@ -298,6 +300,16 @@ const getBlockProps = (block: Block): any => {
             }
 
         case BlockType.TEXT_INPUT:
+            return {
+                ...baseProps,
+                label: block.type,
+                fieldId: block.type.toLowerCase().replace(/\s+/g, '-'),
+                value: props.formData.articleViolatedInput,
+                'onUpdate:value': (val: string) => { props.formData.articleViolatedInput = val },
+                placeholder: block.placeholder
+            }
+
+        case BlockType.TEXTAREA_INPUT:
             return {
                 ...baseProps,
                 label: block.type,

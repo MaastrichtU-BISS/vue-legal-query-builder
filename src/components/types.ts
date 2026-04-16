@@ -17,6 +17,7 @@ export enum BlockType {
   KEYWORDS_INPUT = 'KeywordsInput',
   NETWORK_DEGREES = 'NetworkDegrees',
   TEXT_INPUT = 'TextInput',
+  TEXTAREA_INPUT = 'TextAreaInput',
 }
 
 export interface Block {
