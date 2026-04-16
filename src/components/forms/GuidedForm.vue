@@ -93,7 +93,8 @@
                         :disabled="props.loading"
                         class="btn btn-primary"
                     >
-                        Submit
+                        <Search :size="16" />   
+                        Search Documents
                     </button>
                 </div>
             </div>
@@ -103,7 +104,7 @@
 
 <script setup lang="ts">
 import { ref, computed, defineAsyncComponent } from 'vue'
-import { ArrowLeft, ArrowRight, Home } from 'lucide-vue-next'
+import { ArrowLeft, ArrowRight, Home, Search } from 'lucide-vue-next'
 import type { GuidedStructure, Step, Goal, Block } from '../types'
 import { BlockType } from '../types'
 
