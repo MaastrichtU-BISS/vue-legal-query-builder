@@ -54,7 +54,7 @@
                 <div class="step-content">
                     <div v-for="(block, index) in currentStep.blocks" :key="index">
                         <div class="step-header">
-                            <h4>{{ block.title }}</h4>
+                            <h4>{{ block.title }} <span v-if="block.required" class="required-asterisk">*</span></h4>
                         </div>
                         <p class="step-description">{{ block.description }}</p>
 
@@ -510,6 +510,10 @@ const getBlockProps = (block: Block): any => {
     font-weight: 600;
     color: #243056;
     margin: 0;
+}
+
+.required-asterisk {
+    color: #ef4444;
 }
 
 .step-description {
