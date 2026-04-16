@@ -533,7 +533,6 @@ const getBlockProps = (block: Block): any => {
     gap: 12px;
     justify-content: flex-end;
     padding-top: 16px;
-    border-top: 1px solid #e5e7eb;
 }
 
 .btn {
