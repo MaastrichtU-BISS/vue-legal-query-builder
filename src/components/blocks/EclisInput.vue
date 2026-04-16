@@ -1,6 +1,6 @@
 <template>
     <div class="form-group">
-        <label for="eclis">ECLIs <span class="required-asterisk">*</span> (comma-separated)</label>
+        <label v-if="label" for="eclis">{{ label }} <span v-if="required" class="required-asterisk">*</span> (comma-separated)</label>
         <input id="eclis" v-model="eclis"
             type="text" placeholder="e.g., ECLI:NL:HR:2020:123, ECLI:NL:HR:2020:456" />
     </div>
@@ -8,6 +8,11 @@
 
 <script setup lang="ts">
 const eclis = defineModel<string>('eclis')
+
+defineProps<{
+    label?: string
+    required?: boolean
+}>()
 </script>
 
 <style scoped>

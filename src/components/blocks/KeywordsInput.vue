@@ -1,6 +1,6 @@
 <template>
     <div class="form-group">
-        <label for="keywords">Keywords <span class="required-asterisk">*</span></label>
+        <label v-if="label" for="keywords">{{ label }} <span v-if="required" class="required-asterisk">*</span></label>
         <div class="chips-container">
             <span v-for="(keyword, index) in keywords" :key="index" class="chip">
                 {{ keyword }}
@@ -22,6 +22,11 @@
 <script setup lang="ts">
 const keywords = defineModel<string[]>('keywords', { default: () => [] })
 const currentKeyword = defineModel<string>('currentKeyword', { default: '' })
+
+defineProps<{
+    label?: string
+    required?: boolean
+}>()
 
 const addKeywordFromInput = () => {
     const keyword = currentKeyword.value.trim()

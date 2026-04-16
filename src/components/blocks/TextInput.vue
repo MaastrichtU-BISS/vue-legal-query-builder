@@ -1,6 +1,6 @@
 <template>
     <div class="form-group">
-        <label :for="fieldId">{{ label }}</label>
+        <label v-if="label" :for="fieldId">{{ label }}</label>
         <input :id="fieldId" v-model="value"
             type="text" :placeholder="placeholder" />
     </div>
@@ -10,7 +10,7 @@
 const value = defineModel<string>('value')
 
 defineProps<{
-    label: string
+    label?: string
     fieldId: string
     placeholder: string
 }>()

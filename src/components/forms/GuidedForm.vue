@@ -301,7 +301,6 @@ const getBlockProps = (block: Block): any => {
         case BlockType.TEXT_INPUT:
             return {
                 ...baseProps,
-                label: block.type,
                 fieldId: block.type.toLowerCase().replace(/\s+/g, '-'),
                 value: props.formData.articleViolatedInput,
                 'onUpdate:value': (val: string) => { props.formData.articleViolatedInput = val },
@@ -311,7 +310,6 @@ const getBlockProps = (block: Block): any => {
         case BlockType.TEXTAREA_INPUT:
             return {
                 ...baseProps,
-                label: block.type,
                 fieldId: block.type.toLowerCase().replace(/\s+/g, '-'),
                 value: props.formData.articleViolatedInput,
                 'onUpdate:value': (val: string) => { props.formData.articleViolatedInput = val },

@@ -3,11 +3,17 @@
         <DatasetSelector v-model:selectedDataset="formData.selectedDataset" />
 
         <KeywordsInput
+            label="Keywords"
+            :required="true"
             v-model:keywords="formData.keywords"
             v-model:currentKeyword="currentKeyword"
         />
 
-        <EclisInput v-model:eclis="formData.eclis" />
+        <EclisInput 
+            label="ECLIS"
+            :required="true"
+            v-model:eclis="formData.eclis" 
+        />
 
         <!-- Law References (hidden for now) -->
         <div v-if="false && formData.selectedDataset === DataSource.RS" class="form-group">
