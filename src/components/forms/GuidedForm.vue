@@ -55,7 +55,6 @@
                     <div v-for="(block, index) in currentStep.blocks" :key="index">
                         <div class="step-header">
                             <h4>{{ block.title }}</h4>
-                            <span v-if="block.required" class="required-badge">Required</span>
                         </div>
                         <p class="step-description">{{ block.description }}</p>
 
@@ -512,15 +511,6 @@ const getBlockProps = (block: Block): any => {
     font-weight: 600;
     color: #243056;
     margin: 0;
-}
-
-.required-badge {
-    padding: 2px 8px;
-    background: #fee2e2;
-    color: #991b1b;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
 }
 
 .step-description {
