@@ -93,6 +93,7 @@ const guidedStructure = {
       icon: "layers",
       steps: [
         {
+          title: "Facts",
           blocks: [
             {
               type: BlockType.KEYWORDS_INPUT,
@@ -104,6 +105,7 @@ const guidedStructure = {
           ]
         },
         {
+          title: "Laws",
           blocks: [
             {
               type: BlockType.SELECTED_LAWS,
@@ -114,6 +116,7 @@ const guidedStructure = {
           ]
         },
         {
+          title: "Period",
           blocks: [
             {
               type: BlockType.DATE_RANGE,
@@ -130,6 +133,7 @@ const guidedStructure = {
       icon: "scale",
       steps: [
         {
+          title: "Legal Provisions",
           blocks: [
             {
               type: BlockType.SELECTED_LAWS,
@@ -193,6 +197,18 @@ const guidedStructure = {
 - `TEXT_INPUT` - Generic text input
 - `TEXTAREA_INPUT` - Multi-line text input
 - `IMPORTANCE_LEVEL_SELECTOR` - Case importance level selection
+- `FACTS_INPUT` - Facts input for similarity search
+- `REASONING_INPUT` - Reasoning input for similarity search
+
+## GuidedForm Structure
+
+### Step Object Properties
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `title` | string | Yes | Title displayed below the step number in the stepper |
+| `blocks` | Block[] | Yes | Array of blocks to display in this step |
+
+Each step in the GuidedForm stepper displays its title below the numbered indicator, providing users with a quick overview of what each step entails.
 
 ## Requirements
 
