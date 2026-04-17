@@ -38,13 +38,14 @@
                         class="step-indicator"
                         :class="{ 
                             active: index === currentStepIndex,
-                            completed: index < currentStepIndex
+                            completed: index < currentStepIndex && isStepValid(step),
+                            invalid: index < currentStepIndex && !isStepValid(step)
                         }"
                         @click="!props.loading && jumpToStep(index)"
                         :style="{ cursor: props.loading ? 'not-allowed' : 'pointer' }"
                     >
                         <div class="step-number">
-                            {{ index < currentStepIndex ? '✓' : index + 1 }}
+                            {{ index < currentStepIndex ? (isStepValid(step) ? '✓' : '×') : index + 1 }}
                         </div>
                         <div class="step-title">{{ step.title }}</div>
                     </div>
@@ -213,6 +214,17 @@ const isValid = computed(() => {
     }
     return true // Current goal has all required blocks filled in each step
 })
+
+// Helper to check if a specific step is valid
+function isStepValid(step: Step): boolean {
+    const requiredBlocks = step.blocks.filter(block => block.required)
+    if (requiredBlocks.length === 0) return true // No required blocks means step is valid
+    
+    // Check if at least one required block is filled
+    return requiredBlocks.some(block => 
+        isBlockFilled(block.type as BlockType, props.formData)
+    )
+}
 
 // Methods
 
@@ -544,6 +556,12 @@ const getBlockProps = (block: Block): any => {
 .step-indicator.completed .step-number {
     border-color: #10b981;
     background: #10b981;
+    color: white;
+}
+
+.step-indicator.invalid .step-number {
+    border-color: #ef4444;
+    background: #ef4444;
     color: white;
 }
 
