@@ -1,7 +1,6 @@
 # vue-legal-query-builder
 
-A Vue 3 component for building legal document search queries using the [legal-docs-client](https://www.npmjs.com/package/legal-docs-client) package.
-
+A Vue 3 component library for building legal document search queries. Provides two flexible form modes: **FreeForm** for simple searches and **GuidedForm** for guided, multi-step workflows.
 
 ## Installation
 
@@ -9,17 +8,16 @@ A Vue 3 component for building legal document search queries using the [legal-do
 npm install vue-legal-query-builder
 ```
 
-## Usage
-
-### Import the Component
+## Quick Start
 
 ```vue
 <template>
   <LegalDocsForm 
     title="Search Legal Documents"
-    :on-submit="handleSubmit"
-    @success="onSuccess"
-    @error="onError"
+    type="free"
+    @submit="handleSubmit"
+    @success="handleSuccess"
+    @error="handleError"
   />
 </template>
 
@@ -27,44 +25,174 @@ npm install vue-legal-query-builder
 import { LegalDocsForm, createLegalDocsClient } from 'vue-legal-query-builder'
 import 'vue-legal-query-builder/style.css'
 
-const client = createLegalDocsClient({
-  // config (Optional)
-})
+const client = createLegalDocsClient({})
 
 const handleSubmit = async (queryParams) => {
   const results = await client.fetchDocuments(queryParams)
   return results
 }
 
-const onSuccess = (data) => {
+const handleSuccess = (data) => {
   console.log('Search successful:', data)
 }
 
-const onError = (error) => {
+const handleError = (error) => {
   console.error('Search error:', error)
 }
 </script>
 ```
 
-### Accessing Legal Documents Client Functions
+## Form Types
 
-Since `vue-legal-query-builder` re-exports the entire `legal-docs-client` dependency, you only need to install `vue-legal-query-builder` to access both the form component and the client.
+### FreeForm
+A simple, flat form with all search options available at once. Users can fill in any combination of fields and search immediately.
+
+**Best for:**
+- Quick, flexible searches
+- Expert users who know what they're looking for
+- Minimal user guidance needed
+
+**Example:**
+```vue
+<LegalDocsForm 
+  type="free"
+  title="Search Legal Documents"
+  subtitle="Enter your search criteria below"
+  @submit="handleSubmit"
+/>
+```
+
+### GuidedForm
+A structured, step-by-step workflow organized into "goals" and "steps". Users are guided through a multi-step process tailored to their search needs.
+
+**Best for:**
+- Guided workflows with specific search approaches
+- Complex searches with multiple phases
+- Users who benefit from structured guidance
+
+**Example:**
+```vue
+<template>
+  <LegalDocsForm 
+    type="guided"
+    title="Legal Case Search"
+    subtitle="Choose your search approach"
+    :guidedStructure="guidedStructure"
+    @submit="handleSubmit"
+  />
+</template>
+
+<script setup>
+import { BlockType } from 'vue-legal-query-builder'
+
+const guidedStructure = {
+  goals: [
+    {
+      title: "Similarity Search",
+      description: "Find cases comparable to your facts",
+      icon: "layers",
+      steps: [
+        {
+          blocks: [
+            {
+              type: BlockType.KEYWORDS_INPUT,
+              title: "Describe the facts",
+              description: "Describe the factual situation in natural language",
+              required: true,
+              placeholder: "Example: An employee was dismissed after 10 years of service..."
+            }
+          ]
+        },
+        {
+          blocks: [
+            {
+              type: BlockType.SELECTED_LAWS,
+              title: "Legal provisions",
+              description: "Adding legal provisions improves results",
+              placeholder: "e.g., Art. 7:669 BW, Art. 7:671b BW"
+            }
+          ]
+        },
+        {
+          blocks: [
+            {
+              type: BlockType.DATE_RANGE,
+              title: "Date range",
+              description: "The range determines which time period will be included"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Authority Search",
+      description: "Find highly cited cases",
+      icon: "scale",
+      steps: [
+        {
+          blocks: [
+            {
+              type: BlockType.SELECTED_LAWS,
+              title: "Legal provisions",
+              required: true,
+              placeholder: "e.g., Art. 6:162 BW"
+            },
+            {
+              type: BlockType.KEYWORDS_INPUT,
+              title: "Or keywords",
+              required: true,
+              placeholder: "e.g., onrechtmatige daad"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+</script>
+```
 
 ## Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `title` | string | Form title (optional) |
-| `subtitle` | string | Form subtitle (optional) |
-| `onSubmit` | function | Callback that receives QueryParameters and returns search results (optional) |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `type` | 'free' \| 'guided' | 'free' | Form type (FreeForm or GuidedForm) |
+| `title` | string | undefined | Form title (optional) |
+| `subtitle` | string | undefined | Form subtitle (optional) |
+| `guidedStructure` | GuidedStructure | undefined | Required when `type="guided"` |
 
 ## Events
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `@submit` | QueryParameters | Emitted when form is submitted |
+| `@submit` | QueryParameters | Emitted when form is submitted and data is valid |
 | `@success` | any | Emitted when search completes successfully |
 | `@error` | Error | Emitted when an error occurs |
+
+## Form-Specific Behaviors
+
+### Validation
+- **FreeForm**: At least one of Keywords, ECLIs, or Selected Laws must be provided
+- **GuidedForm**: For each step, at least one required block must be filled (validation applies only to the current goal being submitted)
+
+### Warning Display
+- If validation fails on submit attempt, a yellow warning message appears prompting the user to fill in required fields
+- Users can retry after filling in the necessary fields
+
+## Available Block Types
+
+- `KEYWORDS_INPUT` - Comma-separated keyword input
+- `ECLIS_INPUT` - ECLI code input
+- `SELECTED_LAWS` - Search and select laws with autocomplete
+- `INSTANCES_SELECTOR` - Select court instances
+- `DOMAINS_SELECTOR` - Select legal domains
+- `DOC_TYPE_SELECTOR` - Select decision/opinion types
+- `DATE_RANGE` - Start and end date selection
+- `ARTICLE_FIELD` - Article number input with AND/OR toggle
+- `NETWORK_DEGREES` - Network degree configuration
+- `TEXT_INPUT` - Generic text input
+- `TEXTAREA_INPUT` - Multi-line text input
+- `IMPORTANCE_LEVEL_SELECTOR` - Case importance level selection
 
 ## Requirements
 
@@ -74,14 +202,3 @@ Since `vue-legal-query-builder` re-exports the entire `legal-docs-client` depend
 
 MIT
 
-## Development
-
-Test the package locally:
-
-```bash
-npm run test:dev
-```
-
-## License
-
-MIT
