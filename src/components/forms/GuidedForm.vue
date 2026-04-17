@@ -46,6 +46,7 @@
                         <div class="step-number">
                             {{ index < currentStepIndex ? '✓' : index + 1 }}
                         </div>
+                        <div class="step-title">{{ step.title }}</div>
                     </div>
                 </div>
 
@@ -551,6 +552,16 @@ const getBlockProps = (block: Block): any => {
     color: #666;
     text-align: center;
     word-break: break-word;
+}
+
+.step-title {
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    word-break: break-word;
+    margin-top: 4px;
+    max-width: 80px;
+    white-space: normal;
 }
 
 .step-content {

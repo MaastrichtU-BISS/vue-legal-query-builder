@@ -30,6 +30,7 @@ export interface Block {
 }
 
 export interface Step {
+  title: string
   blocks: Block[]
 }
 
