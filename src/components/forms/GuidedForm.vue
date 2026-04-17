@@ -22,7 +22,7 @@
         <!-- Stepper View -->
         <template v-else-if="currentGoal">
             <div class="stepper-view">
-                <button @click="goBackToGoals" class="btn-back" :disabled="props.loading">
+                <button @click="goBackToGoals" class="btn btn-secondary" :disabled="props.loading">
                     <Home :size="16" />
                     Query Selection
                 </button>
@@ -497,24 +497,8 @@ const getBlockProps = (block: Block): any => {
     gap: 10px;
 }
 
-.btn-back {
+.stepper-view > .btn {
     align-self: flex-start;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    background: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    transition: all 0.2s;
-}
-
-.btn-back:hover {
-    background: #f3f4f6;
-    border-color: #bbb;
 }
 
 .steps-container {
