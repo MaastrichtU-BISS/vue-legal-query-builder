@@ -1,7 +1,7 @@
 <template>
     <div class="legal-docs-form">
-        <h2 class="title">{{ props.title }}</h2>
-        <p class="subtitle">{{ props.subtitle }}</p>
+        <h2 v-if="props.title" class="title">{{ props.title }}</h2>
+        <p v-if="props.subtitle" class="subtitle">{{ props.subtitle }}</p>
         <FreeForm 
             v-if="props.type === FormType.FREE"
             :formData="formData"
@@ -46,8 +46,6 @@ import FreeForm from './forms/FreeForm.vue'
 import GuidedForm from './forms/GuidedForm.vue'
 
 const props = withDefaults(defineProps<LegalDocsFormProps>(), {
-    title: 'Legal Documents Search',
-    subtitle: 'Search across multiple legal databases',
     type: FormType.FREE
 })
 
