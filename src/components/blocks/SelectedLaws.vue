@@ -62,7 +62,7 @@ import { createLegalDocsClient } from 'legal-docs-client'
 import type { LegalDocsClient, BWBItem } from 'legal-docs-client'
 
 
-defineProps<{
+const props = defineProps<{
     label?: string
     required?: boolean
 }>()

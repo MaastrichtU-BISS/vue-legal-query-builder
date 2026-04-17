@@ -223,7 +223,6 @@ const getBlockProps = (block: Block): any => {
         case BlockType.ARTICLE_FIELD:
             return {
                 ...baseProps,
-                label: block.type,
                 fieldName: 'articleField',
                 modelValue: props.formData.articleViolatedInput,
                 'onUpdate:modelValue': (val: string) => { props.formData.articleViolatedInput = val },
@@ -304,7 +303,6 @@ const getBlockProps = (block: Block): any => {
         case BlockType.SELECTED_LAWS:
             return {
                 ...baseProps,
-                label: block.title,
                 selectedLaws: props.formData.selectedLaws,
                 'onUpdate:selectedLaws': (val: string[]) => { props.formData.selectedLaws = val },
                 required: block.required
