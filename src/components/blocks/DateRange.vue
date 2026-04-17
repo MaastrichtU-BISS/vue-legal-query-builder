@@ -16,24 +16,16 @@ const dateStart = defineModel<string>('dateStart')
 const dateEnd = defineModel<string>('dateEnd')
 </script>
 
+<style>
+@import '../../styles/shared.css';
+</style>
+
 <style scoped>
 .form-group-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-bottom: 16px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-label {
-    font-weight: 500;
-    color: #333;
-    font-size: 14px;
 }
 
 input {

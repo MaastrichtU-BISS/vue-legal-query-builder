@@ -23,6 +23,10 @@ defineProps<{
 }>()
 </script>
 
+<style>
+@import '../../styles/shared.css';
+</style>
+
 <style scoped>
 .form-group {
     margin-bottom: 16px;
@@ -34,12 +38,6 @@ defineProps<{
     align-items: center;
     gap: 10px;
     margin-bottom: 8px;
-}
-
-label {
-    font-weight: 500;
-    color: #333;
-    font-size: 14px;
 }
 
 .intersect-toggle {

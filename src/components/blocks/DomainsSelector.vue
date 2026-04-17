@@ -110,14 +110,11 @@ const toggleItemSelection = (value: string, children: string[]) => {
 }
 </script>
 
-<style scoped>
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 8px;
-}
+<style>
+@import '../../styles/shared.css';
+</style>
 
+<style scoped>
 .toggle-advanced {
     padding: 10px 12px;
     background: none;

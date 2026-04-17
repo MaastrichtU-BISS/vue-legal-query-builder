@@ -16,20 +16,11 @@ defineProps<{
 }>()
 </script>
 
+<style>
+@import '../../styles/shared.css';
+</style>
+
 <style scoped>
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-label {
-    font-weight: 500;
-    color: #333;
-    font-size: 14px;
-}
-
 textarea {
     padding: 8px 12px;
     border: 1px solid #ddd;

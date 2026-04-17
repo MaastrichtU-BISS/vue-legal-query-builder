@@ -24,6 +24,10 @@ import { DataSource } from 'legal-docs-client'
 const selectedDataset = defineModel<DataSource>('selectedDataset')
 </script>
 
+<style>
+@import '../../styles/shared.css';
+</style>
+
 <style scoped>
 .button-group {
     display: flex;

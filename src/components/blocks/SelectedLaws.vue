@@ -150,24 +150,11 @@ const removeLaw = (index: number) => {
 }
 </script>
 
+<style>
+@import '../../styles/shared.css';
+</style>
+
 <style scoped>
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-label {
-    font-weight: 500;
-    color: #333;
-    font-size: 14px;
-}
-
-.required-asterisk {
-    color: #ef4444;
-}
-
 .search-container {
     position: relative;
 }
@@ -264,18 +251,6 @@ label {
     margin-top: 8px;
 }
 
-.law-chip {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    background: #dbeafe;
-    border: 1px solid #93c5fd;
-    border-radius: 20px;
-    font-size: 13px;
-    color: #1e40af;
-}
-
 .chip-content {
     display: flex;
     flex-direction: column;
@@ -293,23 +268,5 @@ label {
     font-weight: 400;
     font-size: 12px;
     opacity: 0.85;
-}
-
-.chip-remove {
-    background: none;
-    border: none;
-    color: #1e40af;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    transition: opacity 0.2s;
-}
-
-.chip-remove:hover {
-    opacity: 0.7;
 }
 </style>

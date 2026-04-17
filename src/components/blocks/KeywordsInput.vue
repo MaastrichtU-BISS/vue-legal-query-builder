@@ -58,20 +58,11 @@ const handleKeywordKeydown = (event: KeyboardEvent) => {
 }
 </script>
 
+<style>
+@import '../../styles/shared.css';
+</style>
+
 <style scoped>
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-label {
-    font-weight: 500;
-    color: #333;
-    font-size: 14px;
-}
-
 .chips-container {
     display: flex;
     flex-wrap: wrap;
@@ -81,37 +72,6 @@ label {
     border-radius: 4px;
     background: #fafafa;
     align-items: center;
-}
-
-.chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    background: #3b82f6;
-    color: white;
-    border-radius: 20px;
-    font-size: 14px;
-}
-
-.chip-remove {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    transition: all 0.2s;
-}
-
-.chip-remove:hover {
-    background: rgba(0, 0, 0, 0.2);
 }
 
 .chip-input {
@@ -126,9 +86,5 @@ label {
 
 .chip-input:focus {
     outline: none;
-}
-
-.required-asterisk {
-    color: #ef4444;
 }
 </style>

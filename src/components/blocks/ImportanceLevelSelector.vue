@@ -51,20 +51,11 @@ const toggleLevel = (level: number) => {
 }
 </script>
 
+<style>
+@import '../../styles/shared.css';
+</style>
+
 <style scoped>
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.form-group label {
-    font-weight: 500;
-    color: #374151;
-    font-size: 14px;
-}
-
 .checkbox-group {
     display: flex;
     flex-direction: column;
