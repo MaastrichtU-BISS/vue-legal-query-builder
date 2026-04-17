@@ -117,8 +117,8 @@ import DatasetSelector from '../blocks/DatasetSelector.vue'
 import KeywordsInput from '../blocks/KeywordsInput.vue'
 import EclisInput from '../blocks/EclisInput.vue'
 import ArticleField from '../blocks/ArticleField.vue'
-import TextInput from '../blocks/TextInput.vue'
-import TextAreaInput from '../blocks/TextAreaInput.vue'
+import FactsInput from '../blocks/FactsInput.vue'
+import ReasoningInput from '../blocks/ReasoningInput.vue'
 import DateRange from '../blocks/DateRange.vue'
 import NetworkDegrees from '../blocks/NetworkDegrees.vue'
 import InstancesSelector from '../blocks/InstancesSelector.vue'
@@ -181,10 +181,10 @@ function isBlockFilled(blockType: BlockType, data: any): boolean {
             return (data.articleViolatedInput && data.articleViolatedInput.trim().length > 0) ||
                    (data.articleAppliedInput && data.articleAppliedInput.trim().length > 0) ||
                    (data.articleNonViolatedInput && data.articleNonViolatedInput.trim().length > 0)
-        case BlockType.TEXT_INPUT:
-            return data.applicationNumber && data.applicationNumber.trim().length > 0
-        case BlockType.TEXTAREA_INPUT:
-            return data.languageInput && data.languageInput.trim().length > 0
+        case BlockType.FACTS_INPUT:
+            return data.facts && data.facts.trim().length > 0
+        case BlockType.REASONING_INPUT:
+            return data.reasoning && data.reasoning.trim().length > 0
         case BlockType.DOC_TYPE_SELECTOR:
             return data.decisions || data.opinions
         case BlockType.IMPORTANCE_LEVEL_SELECTOR:
@@ -276,8 +276,8 @@ const getBlockComponent = (blockType: BlockType) => {
         [BlockType.KEYWORDS_INPUT]: KeywordsInput,
         [BlockType.NETWORK_DEGREES]: NetworkDegrees,
         [BlockType.SELECTED_LAWS]: SelectedLaws,
-        [BlockType.TEXT_INPUT]: TextInput,
-        [BlockType.TEXTAREA_INPUT]: TextAreaInput,
+        [BlockType.FACTS_INPUT]: FactsInput,
+        [BlockType.REASONING_INPUT]: ReasoningInput,
     }
     return componentMap[blockType]
 }
@@ -389,6 +389,22 @@ const getBlockProps = (block: Block): any => {
                 fieldId: block.type.toLowerCase().replace(/\s+/g, '-'),
                 value: props.formData.articleViolatedInput,
                 'onUpdate:value': (val: string) => { props.formData.articleViolatedInput = val },
+                placeholder: block.placeholder
+            }
+
+        case BlockType.FACTS_INPUT:
+            return {
+                ...baseProps,
+                facts: props.formData.facts,
+                'onUpdate:facts': (val: string) => { props.formData.facts = val },
+                placeholder: block.placeholder
+            }
+
+        case BlockType.REASONING_INPUT:
+            return {
+                ...baseProps,
+                reasoning: props.formData.reasoning,
+                'onUpdate:reasoning': (val: string) => { props.formData.reasoning = val },
                 placeholder: block.placeholder
             }
 

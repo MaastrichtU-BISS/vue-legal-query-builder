@@ -47,7 +47,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "legal-docs-client": "^0.2.1",
+    "legal-docs-client": "^0.2.4",
     "lucide-vue-next": "^1.0.0"
   },
   "peerDependencies": {

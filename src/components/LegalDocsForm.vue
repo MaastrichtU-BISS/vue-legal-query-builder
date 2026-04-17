@@ -78,6 +78,9 @@ const formData = reactive({
     opinions: false,
     engine: 'ES',
     attributesToFetch: 'ALL',
+    // Similarity Search fields
+    facts: '',
+    reasoning: '',
     // ECHR-specific
     articleViolatedInput: '',
     articleAppliedInput: '',
@@ -116,6 +119,8 @@ function parseParameters(): QueryParameters {
     if (formData.articles) params.articles = formData.articles
     if (formData.selectedLaws.length > 0) params.selectedLaws = formData.selectedLaws
     if (formData.selectedLawsIntersect !== undefined) params.selectedLawsIntersect = formData.selectedLawsIntersect
+    if (formData.facts) params.facts = formData.facts
+    if (formData.reasoning) params.reasoning = formData.reasoning
 
     // Parse ECLIs
     if (formData.eclis) {

@@ -12,13 +12,13 @@ export enum BlockType {
   DOC_TYPE_SELECTOR = 'DocTypeSelector',
   DOMAINS_SELECTOR = 'DomainsSelector',
   ECLIS_INPUT = 'EclisInput',
+  FACTS_INPUT = 'FactsInput',
   IMPORTANCE_LEVEL_SELECTOR = 'ImportanceLevelSelector',
   INSTANCES_SELECTOR = 'InstancesSelector',
   KEYWORDS_INPUT = 'KeywordsInput',
   NETWORK_DEGREES = 'NetworkDegrees',
+  REASONING_INPUT = 'ReasoningInput',
   SELECTED_LAWS = 'SelectedLaws',
-  TEXT_INPUT = 'TextInput',
-  TEXTAREA_INPUT = 'TextAreaInput',
 }
 
 export interface Block {
