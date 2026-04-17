@@ -28,6 +28,11 @@
             {{ error }}
         </div>
 
+        <!-- Warning Message -->
+        <div v-if="!loading && !successMessage && hasValidationWarning" class="warning-message">
+            Please enter at least one of the required <strong>*</strong> fields.
+        </div>
+
         <!-- Loader -->
         <div v-if="loading" class="loader-container">
             <div class="spinner"></div>
@@ -37,11 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import type { QueryParameters } from 'legal-docs-client'
 import { DataSource, DocType } from 'legal-docs-client'
 import type { LegalDocsFormProps } from './types'
-import { FormType } from './types'
+import { FormType, type BlockType } from './types'
 import FreeForm from './forms/FreeForm.vue'
 import GuidedForm from './forms/GuidedForm.vue'
 
@@ -90,8 +95,7 @@ const formData = reactive({
 const loading = ref(false)
 const error = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
-
-// Parse form data to QueryParameters
+const hasValidationWarning = ref(false)
 function parseParameters(): QueryParameters {
     const doctypes: DocType[] = []
     if (formData.decisions) doctypes.push(DocType.DEC)
@@ -165,14 +169,14 @@ function parseParameters(): QueryParameters {
     return params
 }
 
-const handleSubmit = async () => {
+const handleSubmit = async (isValid: boolean) => {
     // Clear previous messages
     error.value = null
     successMessage.value = null
+    hasValidationWarning.value = !isValid
 
-    // Validate that either keywords or ECLIs are provided
-    if (formData.keywords.length === 0 && !formData.eclis.trim()) {
-        error.value = 'Please enter either keywords or ECLIs to search'
+    // If validation failed, don't proceed
+    if (!isValid) {
         return
     }
 

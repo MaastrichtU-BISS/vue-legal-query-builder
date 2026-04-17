@@ -89,7 +89,7 @@
                     </button>
                     <button 
                         v-else
-                        @click="submitGoal" 
+                        @click="handleSubmit" 
                         :disabled="props.loading"
                         class="btn btn-primary"
                     >
@@ -132,7 +132,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-    'submit': []
+    'submit': [isValid: boolean]
     'handleReset': []
 }>()
 
@@ -158,6 +158,59 @@ const currentGoal = computed((): Goal | undefined => {
 
 const currentStep = computed((): Step | undefined => {
     return currentGoal.value?.steps[currentStepIndex.value]
+})
+
+// Helper to check if a block is filled
+function isBlockFilled(blockType: BlockType, data: any): boolean {
+    switch (blockType) {
+        case BlockType.KEYWORDS_INPUT:
+            return data.keywords && data.keywords.length > 0
+        case BlockType.ECLIS_INPUT:
+            return data.eclis && data.eclis.trim().length > 0
+        case BlockType.SELECTED_LAWS:
+            return data.selectedLaws && data.selectedLaws.length > 0
+        case BlockType.INSTANCES_SELECTOR:
+            return data.selectedInstances && data.selectedInstances.length > 0
+        case BlockType.DOMAINS_SELECTOR:
+            return data.selectedDomains && data.selectedDomains.length > 0
+        case BlockType.ARTICLE_FIELD:
+            return (data.articleViolatedInput && data.articleViolatedInput.trim().length > 0) ||
+                   (data.articleAppliedInput && data.articleAppliedInput.trim().length > 0) ||
+                   (data.articleNonViolatedInput && data.articleNonViolatedInput.trim().length > 0)
+        case BlockType.TEXT_INPUT:
+            return data.applicationNumber && data.applicationNumber.trim().length > 0
+        case BlockType.TEXTAREA_INPUT:
+            return data.languageInput && data.languageInput.trim().length > 0
+        case BlockType.DOC_TYPE_SELECTOR:
+            return data.decisions || data.opinions
+        case BlockType.IMPORTANCE_LEVEL_SELECTOR:
+            return data.importance && data.importance.length > 0
+        default:
+            return false
+    }
+}
+
+// Validation logic for GuidedForm: for each step, at least one required block must be filled
+const isValid = computed(() => {
+    if (!props.guidedStructure?.goals) return true
+    
+    for (const goal of props.guidedStructure.goals) {
+        for (const step of goal.steps) {
+            // Check if this step has any required blocks
+            const requiredBlocks = step.blocks.filter(block => block.required)
+            if (requiredBlocks.length === 0) continue // Skip steps with no required blocks
+            
+            // Check if at least one required block is filled
+            const hasFilledRequiredBlock = requiredBlocks.some(block => 
+                isBlockFilled(block.type as BlockType, props.formData)
+            )
+            
+            if (!hasFilledRequiredBlock) {
+                return false // Invalid: This step has unfilled required blocks
+            }
+        }
+    }
+    return true // All steps have at least one required block filled
 })
 
 // Methods
@@ -193,8 +246,8 @@ const jumpToStep = (index: number) => {
     }
 }
 
-const submitGoal = () => {
-    emit('submit')
+const handleSubmit = () => {
+    emit('submit', isValid.value)
 }
 
 const getBlockComponent = (blockType: BlockType) => {

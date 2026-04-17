@@ -1,25 +1,14 @@
 <template>
     <form @submit.prevent="handleSubmit" class="form-container">
         <DatasetSelector v-model:selectedDataset="formData.selectedDataset" />
-        
-        <SelectedLaws 
-            v-if="formData.selectedDataset === DataSource.RS"
-            label="Law Articles"
-            v-model:selectedLaws="formData.selectedLaws"
-        />
 
-        <KeywordsInput
-            label="Keywords"
-            :required="true"
-            v-model:keywords="formData.keywords"
-            v-model:currentKeyword="currentKeyword"
-        />
+        <SelectedLaws v-if="formData.selectedDataset === DataSource.RS" :required="true" label="Law Articles"
+            v-model:selectedLaws="formData.selectedLaws" />
 
-        <EclisInput 
-            label="ECLIS"
-            :required="true"
-            v-model:eclis="formData.eclis" 
-        />
+        <KeywordsInput label="Keywords" :required="true" v-model:keywords="formData.keywords"
+            v-model:currentKeyword="currentKeyword" />
+
+        <EclisInput label="ECLIS" :required="true" v-model:eclis="formData.eclis" />
 
         <!-- Law References (hidden for now) -->
         <div v-if="false && formData.selectedDataset === DataSource.RS" class="form-group">
@@ -30,54 +19,30 @@
 
         <!-- ECHR-specific: Article Fields -->
         <template v-if="formData.selectedDataset === DataSource.ECHR">
-            <ArticleField
-                label="Articles Violated"
-                fieldName="articleViolated"
-                v-model:value="formData.articleViolatedInput"
-                v-model:isIntersect="formData.articleViolatedIntersect"
-                placeholder="e.g., P1-1, 3, 8"
-            />
+            <ArticleField label="Articles Violated" fieldName="articleViolated"
+                v-model:value="formData.articleViolatedInput" v-model:isIntersect="formData.articleViolatedIntersect"
+                placeholder="e.g., P1-1, 3, 8" />
 
-            <ArticleField
-                label="Articles Applied"
-                fieldName="articleApplied"
-                v-model:value="formData.articleAppliedInput"
-                v-model:isIntersect="formData.articleAppliedIntersect"
-                placeholder="e.g., P1-1, 3, 8"
-            />
+            <ArticleField label="Articles Applied" fieldName="articleApplied"
+                v-model:value="formData.articleAppliedInput" v-model:isIntersect="formData.articleAppliedIntersect"
+                placeholder="e.g., P1-1, 3, 8" />
 
-            <ArticleField
-                label="Articles Non-Violated"
-                fieldName="articleNonViolated"
+            <ArticleField label="Articles Non-Violated" fieldName="articleNonViolated"
                 v-model:value="formData.articleNonViolatedInput"
-                v-model:isIntersect="formData.articleNonViolatedIntersect"
-                placeholder="e.g., P1-1, 3, 8"
-            />
+                v-model:isIntersect="formData.articleNonViolatedIntersect" placeholder="e.g., P1-1, 3, 8" />
 
-            <TextInput
-                label="Application Numbers (comma-separated)"
-                fieldId="applicationNumber"
-                v-model:value="formData.applicationNumber"
-                placeholder="e.g., 12345/00, 67890/01"
-            />
+            <TextInput label="Application Numbers (comma-separated)" fieldId="applicationNumber"
+                v-model:value="formData.applicationNumber" placeholder="e.g., 12345/00, 67890/01" />
 
-            <TextInput
-                label="Respondent State (comma-separated)"
-                fieldId="respondentState"
-                v-model:value="formData.respondentStateInput"
-                placeholder="e.g., NLD, FRA, DEU"
-            />
+            <TextInput label="Respondent State (comma-separated)" fieldId="respondentState"
+                v-model:value="formData.respondentStateInput" placeholder="e.g., NLD, FRA, DEU" />
         </template>
 
-        <InstancesSelector 
-            v-if="formData.selectedDataset === DataSource.RS"
-            v-model:selectedValues="formData.selectedInstances"
-        />
+        <InstancesSelector v-if="formData.selectedDataset === DataSource.RS"
+            v-model:selectedValues="formData.selectedInstances" />
 
-        <DomainsSelector 
-            v-if="formData.selectedDataset === DataSource.RS"
-            v-model:selectedValues="formData.selectedDomains"
-        />
+        <DomainsSelector v-if="formData.selectedDataset === DataSource.RS"
+            v-model:selectedValues="formData.selectedDomains" />
 
         <!-- Advanced Settings Toggle -->
         <div class="form-group">
@@ -88,21 +53,13 @@
 
         <!-- Advanced Settings -->
         <template v-if="showAdvanced">
-            <DateRange
-                v-model:dateStart="formData.dateStart"
-                v-model:dateEnd="formData.dateEnd"
-            />
+            <DateRange v-model:dateStart="formData.dateStart" v-model:dateEnd="formData.dateEnd" />
 
-            <NetworkDegrees
-                v-model:degreesSource="formData.degreesSource"
-                v-model:degreesTarget="formData.degreesTarget"
-            />
+            <NetworkDegrees v-model:degreesSource="formData.degreesSource"
+                v-model:degreesTarget="formData.degreesTarget" />
 
-            <DocTypeSelector 
-                v-if="formData.selectedDataset === DataSource.RS"
-                v-model:decisions="formData.decisions"
-                v-model:opinions="formData.opinions"
-            />
+            <DocTypeSelector v-if="formData.selectedDataset === DataSource.RS" v-model:decisions="formData.decisions"
+                v-model:opinions="formData.opinions" />
 
             <!-- ECHR Advanced -->
             <template v-if="formData.selectedDataset === DataSource.ECHR">
@@ -122,17 +79,11 @@
                 </div>
 
                 <!-- Language -->
-                <TextInput
-                    label="Language (comma-separated)"
-                    fieldId="language"
-                    v-model:value="formData.languageInput"
-                    placeholder="e.g., ENG, FRE"
-                />
+                <TextInput label="Language (comma-separated)" fieldId="language" v-model:value="formData.languageInput"
+                    placeholder="e.g., ENG, FRE" />
 
                 <!-- Importance Levels -->
-                <ImportanceLevelSelector 
-                    v-model:importance="formData.importance"
-                />
+                <ImportanceLevelSelector v-model:importance="formData.importance" />
             </template>
         </template>
 
@@ -141,20 +92,15 @@
             <button type="button" @click="emit('handleReset')" :disabled="loading" class="btn btn-secondary">
                 Reset
             </button>
-            <button type="submit" :disabled="loading || (!formData.keywords.length && !formData.eclis.trim())" class="btn btn-primary">
+            <button type="submit" :disabled="loading" class="btn btn-primary">
                 {{ loading ? 'Searching...' : 'Search Documents' }}
             </button>
-        </div>
-
-        <!-- Warning Message -->
-        <div v-if="formData.keywords.length === 0 && !formData.eclis.trim()" class="warning-message">
-            <strong>*</strong> Required: Please enter either keywords or ECLIs to search
         </div>
     </form>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { DataSource } from 'legal-docs-client'
 import DatasetSelector from '../blocks/DatasetSelector.vue'
 import KeywordsInput from '../blocks/KeywordsInput.vue'
@@ -175,14 +121,23 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    'submit': []
+    'submit': [isValid: boolean]
     'handleReset': []
 }>()
 
 const currentKeyword = ref('')
 const showAdvanced = ref(false)
 
-const handleSubmit = () => emit('submit')
+// Validation logic for FreeForm: at least one required field must be filled
+const isValid = computed(() => {
+    return props.formData.keywords.length > 0 
+        || props.formData.eclis.trim().length > 0 
+        || props.formData.selectedLaws.length > 0
+})
+
+const handleSubmit = () => {
+    emit('submit', isValid.value)
+}
 </script>
 
 <style scoped>
