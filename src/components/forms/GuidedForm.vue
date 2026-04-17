@@ -20,7 +20,7 @@
         </template>
 
         <!-- Stepper View -->
-        <template v-else>
+        <template v-else-if="currentGoal">
             <div class="stepper-view">
                 <button @click="goBackToGoals" class="btn-back" :disabled="props.loading">
                     <Home :size="16" />
@@ -46,12 +46,11 @@
                         <div class="step-number">
                             {{ index < currentStepIndex ? '✓' : index + 1 }}
                         </div>
-                        <span class="step-label">{{ step.title }}</span>
                     </div>
                 </div>
 
                 <!-- Current Step Content -->
-                <div class="step-content">
+                <div class="step-content" v-if="currentStep">
                     <div v-for="(block, index) in currentStep.blocks" :key="index">
                         <div class="step-header">
                             <h4>{{ block.title }} <span v-if="block.required" class="required-asterisk">*</span></h4>
@@ -142,7 +141,7 @@ const getIconComponent = (iconName: string) => {
         let name = iconName.replace(/^lucide-/, '')
         // Convert kebab-case to PascalCase
         name = name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('')
-        return import('lucide-vue-next').then(module => module[name] || null)
+        return import('lucide-vue-next').then(module => module[name] as any)
     })
 }
 
