@@ -93,6 +93,7 @@
                 Reset
             </button>
             <button type="submit" :disabled="loading" class="btn btn-primary">
+                <Search :size="16" />
                 {{ loading ? 'Searching...' : 'Search Documents' }}
             </button>
         </div>
@@ -102,6 +103,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { DataSource } from 'legal-docs-client'
+import { Search } from 'lucide-vue-next'
 import DatasetSelector from '../blocks/DatasetSelector.vue'
 import KeywordsInput from '../blocks/KeywordsInput.vue'
 import EclisInput from '../blocks/EclisInput.vue'
@@ -141,17 +143,12 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
+@import '../../styles/shared.css';
+
 .form-container {
     display: flex;
     flex-direction: column;
     gap: 16px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 8px;
 }
 
 .form-group-row {
@@ -222,43 +219,6 @@ const handleSubmit = () => {
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid #e5e7eb;
-}
-
-.btn {
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid;
-}
-
-.btn-primary {
-    background: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-}
-
-.btn-primary:hover:not(:disabled) {
-    background: #2563eb;
-    border-color: #2563eb;
-}
-
-.btn-secondary {
-    background: white;
-    color: #333;
-    border-color: #ddd;
-}
-
-.btn-secondary:hover:not(:disabled) {
-    background: #f9fafb;
-    border-color: #999;
-}
-
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 
 .help-text {

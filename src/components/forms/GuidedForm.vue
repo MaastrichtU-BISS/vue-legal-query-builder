@@ -383,6 +383,8 @@ const getBlockProps = (block: Block): any => {
 </script>
 
 <style scoped>
+@import '../../styles/shared.css';
+
 .guided-form-container {
     margin: 0 auto;
     padding: 20px;
@@ -548,8 +550,6 @@ const getBlockProps = (block: Block): any => {
     word-break: break-word;
 }
 
-
-
 .step-content {
     padding: 24px;
     background: #f9fafb;
@@ -569,10 +569,6 @@ const getBlockProps = (block: Block): any => {
     font-weight: 600;
     color: #243056;
     margin: 0;
-}
-
-.required-asterisk {
-    color: #ef4444;
 }
 
 .step-description {
@@ -597,45 +593,5 @@ const getBlockProps = (block: Block): any => {
     gap: 12px;
     justify-content: flex-end;
     padding-top: 16px;
-}
-
-.btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid;
-}
-
-.btn-primary {
-    background: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-}
-
-.btn-primary:hover:not(:disabled) {
-    background: #2563eb;
-    border-color: #2563eb;
-}
-
-.btn-secondary {
-    background: white;
-    color: #333;
-    border-color: #ddd;
-}
-
-.btn-secondary:hover:not(:disabled) {
-    background: #f3f4f6;
-    border-color: #bbb;
-}
-
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 </style>
