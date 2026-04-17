@@ -63,6 +63,7 @@ const formData = reactive({
     keywords: [] as string[],
     eclis: '',
     articles: '',
+    selectedLaws: [] as string[],
     selectedLawsIntersect: true,
     selectedInstances: [] as string[],
     selectedDomains: [] as string[],
@@ -111,6 +112,7 @@ function parseParameters(): QueryParameters {
 
     if (formData.keywords.length > 0) params.keywords = formData.keywords
     if (formData.articles) params.articles = formData.articles
+    if (formData.selectedLaws.length > 0) params.selectedLaws = formData.selectedLaws
     if (formData.selectedLawsIntersect !== undefined) params.selectedLawsIntersect = formData.selectedLawsIntersect
 
     // Parse ECLIs
@@ -211,6 +213,7 @@ const handleReset = () => {
     formData.keywords = []
     formData.eclis = ''
     formData.articles = ''
+    formData.selectedLaws = []
     formData.selectedLawsIntersect = true
     formData.selectedInstances = []
     formData.selectedDomains = []

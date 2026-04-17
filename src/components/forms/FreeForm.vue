@@ -1,6 +1,12 @@
 <template>
     <form @submit.prevent="handleSubmit" class="form-container">
         <DatasetSelector v-model:selectedDataset="formData.selectedDataset" />
+        
+        <SelectedLaws 
+            v-if="formData.selectedDataset === DataSource.RS"
+            label="Law Articles"
+            v-model:selectedLaws="formData.selectedLaws"
+        />
 
         <KeywordsInput
             label="Keywords"
@@ -159,6 +165,7 @@ import DateRange from '../blocks/DateRange.vue'
 import NetworkDegrees from '../blocks/NetworkDegrees.vue'
 import InstancesSelector from '../blocks/InstancesSelector.vue'
 import DomainsSelector from '../blocks/DomainsSelector.vue'
+import SelectedLaws from '../blocks/SelectedLaws.vue'
 import DocTypeSelector from '../blocks/DocTypeSelector.vue'
 import ImportanceLevelSelector from '../blocks/ImportanceLevelSelector.vue'
 

@@ -16,6 +16,7 @@ export enum BlockType {
   INSTANCES_SELECTOR = 'InstancesSelector',
   KEYWORDS_INPUT = 'KeywordsInput',
   NETWORK_DEGREES = 'NetworkDegrees',
+  SELECTED_LAWS = 'SelectedLaws',
   TEXT_INPUT = 'TextInput',
   TEXTAREA_INPUT = 'TextAreaInput',
 }

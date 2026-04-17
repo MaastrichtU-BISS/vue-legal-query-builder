@@ -119,6 +119,7 @@ import DateRange from '../blocks/DateRange.vue'
 import NetworkDegrees from '../blocks/NetworkDegrees.vue'
 import InstancesSelector from '../blocks/InstancesSelector.vue'
 import DomainsSelector from '../blocks/DomainsSelector.vue'
+import SelectedLaws from '../blocks/SelectedLaws.vue'
 import DocTypeSelector from '../blocks/DocTypeSelector.vue'
 import ImportanceLevelSelector from '../blocks/ImportanceLevelSelector.vue'
 
@@ -208,6 +209,7 @@ const getBlockComponent = (blockType: BlockType) => {
         [BlockType.INSTANCES_SELECTOR]: InstancesSelector,
         [BlockType.KEYWORDS_INPUT]: KeywordsInput,
         [BlockType.NETWORK_DEGREES]: NetworkDegrees,
+        [BlockType.SELECTED_LAWS]: SelectedLaws,
         [BlockType.TEXT_INPUT]: TextInput,
         [BlockType.TEXTAREA_INPUT]: TextAreaInput,
     }
@@ -297,6 +299,15 @@ const getBlockProps = (block: Block): any => {
                 'onUpdate:degreesSource': (val: number) => { props.formData.degreesSource = val },
                 degreesTarget: props.formData.degreesTarget,
                 'onUpdate:degreesTarget': (val: number) => { props.formData.degreesTarget = val }
+            }
+
+        case BlockType.SELECTED_LAWS:
+            return {
+                ...baseProps,
+                label: block.title,
+                selectedLaws: props.formData.selectedLaws,
+                'onUpdate:selectedLaws': (val: string[]) => { props.formData.selectedLaws = val },
+                required: block.required
             }
 
         case BlockType.TEXT_INPUT:
