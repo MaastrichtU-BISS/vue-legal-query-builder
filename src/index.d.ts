@@ -9,7 +9,6 @@ import type {
   LegalDocsClient,
   LegalDocsClientConfig,
 } from "legal-docs-client";
-import type { LegalDocsQuery } from "./components/types";
 
 export declare enum FormType {
   FREE = "free",
@@ -64,6 +63,10 @@ export interface GuidedStructure {
   goals: Goal[];
 }
 
+export type LegalDocsQuery =
+  | { dataset: "RS"; params: RechtspraakQueryParameters }
+  | { dataset: "ECHR"; params: EchrQueryParameters };
+
 export interface LegalDocsFormProps {
   title?: string;
   subtitle?: string;
@@ -75,7 +78,6 @@ export interface LegalDocsFormProps {
 export declare const LegalDocsForm: DefineComponent<LegalDocsFormProps, {}, any>;
 
 export type {
-  LegalDocsQuery,
   RechtspraakQueryParameters,
   RechtspraakDocument,
   RechtspraakFullTextDocument,
