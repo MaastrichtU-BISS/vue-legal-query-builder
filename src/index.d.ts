@@ -55,6 +55,7 @@ export interface Goal {
   title: string;
   description: string;
   icon?: string;
+  dataset?: Dataset;
   fixedParameters?: GoalFixedParameters;
   steps: Step[];
 }

@@ -259,8 +259,15 @@ const selectGoal = (index: number) => {
     selectedGoalIndex.value = index
     currentStepIndex.value = 0
 
+    const goal = props.guidedStructure?.goals[index]
+
+    // Pin the dataset for this goal, if declared. A DATASET_SELECTOR block in its steps can still change it afterwards.
+    if (goal?.dataset) {
+        props.formData.selectedDataset = goal.dataset
+    }
+
     // Persist hidden fixed parameters for the selected goal so parent parsing can merge them.
-    props.formData.guidedFixedParameters = props.guidedStructure?.goals[index]?.fixedParameters || {}
+    props.formData.guidedFixedParameters = goal?.fixedParameters || {}
 }
 
 const previousStep = () => {

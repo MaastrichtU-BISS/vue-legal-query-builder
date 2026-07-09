@@ -46,6 +46,8 @@ export interface Goal {
   title: string
   description: string
   icon?: string
+  /** Dataset this goal queries. Applied when the goal is selected, same as fixedParameters; a DATASET_SELECTOR block in its steps can still change it afterwards. */
+  dataset?: Dataset
   fixedParameters?: GoalFixedParameters
   steps: Step[]
 }

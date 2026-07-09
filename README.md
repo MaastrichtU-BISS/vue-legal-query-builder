@@ -239,8 +239,23 @@ const guidedStructure = {
 | `title` | string | Yes | Goal title shown in the goal card |
 | `description` | string | Yes | Goal description shown in the goal card |
 | `icon` | string | No | Optional Lucide icon name (for example `scale`, `layers`) |
+| `dataset` | `'RS' \| 'ECHR' \| 'CJEU'` | No | Dataset this goal queries. Applied when the goal is selected; a `DATASET_SELECTOR` block in its steps can still change it afterwards |
 | `fixedParameters` | GoalFixedParameters | No | Hidden query parameters automatically merged into the submitted query when this goal is selected |
 | `steps` | Step[] | Yes | Steps shown after selecting the goal |
+
+### dataset
+By default, every goal queries whichever dataset is currently selected (`'RS'` unless changed) — there's a single, form-wide dataset value, not one per goal. Set `dataset` on a goal to pin it to `'RS'` or `'ECHR'` without needing to show a `DATASET_SELECTOR` block in its steps.
+
+```ts
+{
+  title: "ECHR Case Search",
+  description: "Search European Court of Human Rights case law",
+  dataset: "ECHR",
+  steps: [
+    // ...
+  ],
+}
+```
 
 ### fixedParameters
 Use `fixedParameters` when you want to enforce specific query values for a goal without exposing extra controls in the UI. `GoalFixedParameters` is the intersection of `RechtspraakQueryParameters` and `EchrQueryParameters`, so it works regardless of which dataset the goal ends up using.
