@@ -29,8 +29,11 @@ const client = createLegalDocsClient({
   apiKey: import.meta.env.VITE_CITATIONS_API_KEY,
 })
 
-const handleSubmit = async (queryParams) => {
-  const results = await client.fetchDocuments(queryParams)
+const handleSubmit = async (query) => {
+  // `query` is a discriminated union: { dataset: 'RS', params } | { dataset: 'ECHR', params }
+  const results = query.dataset === 'RS'
+    ? await client.fetchRechtspraak(query.params)
+    : await client.fetchEchr(query.params)
   return results
 }
 
@@ -65,6 +68,10 @@ const client = createLegalDocsClient({
 
 New API keys can be generated here:
 https://api.caselawexplorer.tech/login.html?next=/account.html
+
+## Datasets
+
+The dataset selector supports **Rechtspraak** (Dutch case law) and **ECHR** (European Court of Human Rights); each produces its own query parameter shape (`RechtspraakQueryParameters` / `EchrQueryParameters`) reflected in the `dataset` discriminant of the submitted `LegalDocsQuery`. **CJEU** is shown as a disabled placeholder — `legal-docs-client` has no backing endpoint for it yet.
 
 ## Form Types
 
@@ -193,7 +200,7 @@ const guidedStructure = {
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `@submit` | QueryParameters | Emitted when form is submitted and data is valid |
+| `@submit` | LegalDocsQuery | Emitted when form is submitted and data is valid. `LegalDocsQuery` is `{ dataset: 'RS', params: RechtspraakQueryParameters } \| { dataset: 'ECHR', params: EchrQueryParameters }` |
 | `@success` | any | Emitted when search completes successfully |
 | `@error` | Error | Emitted when an error occurs |
 
@@ -232,14 +239,14 @@ const guidedStructure = {
 | `title` | string | Yes | Goal title shown in the goal card |
 | `description` | string | Yes | Goal description shown in the goal card |
 | `icon` | string | No | Optional Lucide icon name (for example `scale`, `layers`) |
-| `fixedParameters` | Partial<QueryParameters> | No | Hidden query parameters automatically merged into the submitted query when this goal is selected |
+| `fixedParameters` | GoalFixedParameters | No | Hidden query parameters automatically merged into the submitted query when this goal is selected |
 | `steps` | Step[] | Yes | Steps shown after selecting the goal |
 
 ### fixedParameters
-Use `fixedParameters` when you want to enforce specific query values for a goal without exposing extra controls in the UI.
+Use `fixedParameters` when you want to enforce specific query values for a goal without exposing extra controls in the UI. `GoalFixedParameters` is the intersection of `RechtspraakQueryParameters` and `EchrQueryParameters`, so it works regardless of which dataset the goal ends up using.
 
 - Applied only for the currently selected goal
-- Merged into the final `QueryParameters` right before submit
+- Merged into the final query params (`RechtspraakQueryParameters` or `EchrQueryParameters`, depending on the selected dataset) right before submit
 - If a fixed key overlaps with user-entered data, the fixed value takes precedence
 
 **Example:** force `degreesTarget: 1` for an authority-search goal.

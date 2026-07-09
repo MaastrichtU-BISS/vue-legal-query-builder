@@ -209,7 +209,7 @@ function isBlockFilled(blockType: BlockType | string, data: any): boolean {
         case BlockType.DOC_TYPE_SELECTOR:
             return data.decisions || data.opinions
         case BlockType.IMPORTANCE_LEVEL_SELECTOR:
-            return data.importance && data.importance.length > 0
+            return typeof data.importance === 'number'
         default:
             return false
     }
@@ -371,7 +371,7 @@ const getBlockProps = (block: Block): any => {
             return {
                 ...baseProps,
                 importance: props.formData.importance,
-                'onUpdate:importance': (val: number[]) => { props.formData.importance = val }
+                'onUpdate:importance': (val: number | undefined) => { props.formData.importance = val }
             }
 
         case BlockType.INSTANCES_SELECTOR:

@@ -1,4 +1,4 @@
-import type { QueryParameters } from 'legal-docs-client'
+import type { RechtspraakQueryParameters, EchrQueryParameters } from 'legal-docs-client'
 
 export enum FormType {
   FREE = 'free',
@@ -23,6 +23,9 @@ export enum BlockType {
   TEXTAREA_INPUT = 'TextAreaInput',
 }
 
+/** Dataset a query targets. CJEU has no backing endpoint in legal-docs-client yet and stays disabled in the UI. */
+export type Dataset = 'RS' | 'ECHR' | 'CJEU'
+
 export interface Block {
   type: BlockType
   title: string
@@ -36,11 +39,14 @@ export interface Step {
   blocks: Block[]
 }
 
+/** Shared subset of both query shapes; overlapping field names have compatible types across the two APIs. */
+export type GoalFixedParameters = Partial<RechtspraakQueryParameters> & Partial<EchrQueryParameters>
+
 export interface Goal {
   title: string
   description: string
   icon?: string
-  fixedParameters?: Partial<QueryParameters>
+  fixedParameters?: GoalFixedParameters
   steps: Step[]
 }
 
@@ -48,11 +54,15 @@ export interface GuidedStructure {
   goals: Goal[]
 }
 
+/** Discriminated union so a host app knows which client method to call with `params`. */
+export type LegalDocsQuery =
+  | { dataset: 'RS'; params: RechtspraakQueryParameters }
+  | { dataset: 'ECHR'; params: EchrQueryParameters }
+
 export interface LegalDocsFormProps {
   title?: string
   subtitle?: string
   type?: FormType
   guidedStructure?: GuidedStructure
-  onSubmit?: (data: QueryParameters) => Promise<any>
+  onSubmit?: (data: LegalDocsQuery) => Promise<any>
 }
-

@@ -1,34 +1,91 @@
 import type { DefineComponent, Plugin } from "vue";
 import type {
-  FullTextDocument,
+  RechtspraakQueryParameters,
+  RechtspraakDocument,
+  RechtspraakFullTextDocument,
+  EchrQueryParameters,
+  EchrDocument,
+  EchrFullTextDocument,
   LegalDocsClient,
   LegalDocsClientConfig,
-  LegalDocument,
-  QueryParameters,
 } from "legal-docs-client";
+import type { LegalDocsQuery } from "./components/types";
 
 export declare enum FormType {
   FREE = "free",
   GUIDED = "guided",
 }
 
+export declare enum BlockType {
+  ARTICLE_FIELD = "ArticleField",
+  DATASET_SELECTOR = "DatasetSelector",
+  DATE_RANGE = "DateRange",
+  DOC_TYPE_SELECTOR = "DocTypeSelector",
+  DOMAINS_SELECTOR = "DomainsSelector",
+  ECLIS_INPUT = "EclisInput",
+  FACTS_INPUT = "FactsInput",
+  IMPORTANCE_LEVEL_SELECTOR = "ImportanceLevelSelector",
+  INSTANCES_SELECTOR = "InstancesSelector",
+  KEYWORDS_INPUT = "KeywordsInput",
+  NETWORK_DEGREES = "NetworkDegrees",
+  REASONING_INPUT = "ReasoningInput",
+  SELECTED_LAWS = "SelectedLaws",
+  TEXT_INPUT = "TextInput",
+  TEXTAREA_INPUT = "TextAreaInput",
+}
+
+export type Dataset = "RS" | "ECHR" | "CJEU";
+
+export interface Block {
+  type: BlockType;
+  title: string;
+  description: string;
+  placeholder?: string;
+  required?: boolean;
+}
+
+export interface Step {
+  title: string;
+  blocks: Block[];
+}
+
+export type GoalFixedParameters = Partial<RechtspraakQueryParameters> & Partial<EchrQueryParameters>;
+
+export interface Goal {
+  title: string;
+  description: string;
+  icon?: string;
+  fixedParameters?: GoalFixedParameters;
+  steps: Step[];
+}
+
+export interface GuidedStructure {
+  goals: Goal[];
+}
+
 export interface LegalDocsFormProps {
   title?: string;
   subtitle?: string;
   type?: FormType;
-  guidedStructure?: unknown;
-  onSubmit?: (data: QueryParameters) => Promise<any>;
+  guidedStructure?: GuidedStructure;
+  onSubmit?: (data: LegalDocsQuery) => Promise<any>;
 }
 
 export declare const LegalDocsForm: DefineComponent<LegalDocsFormProps, {}, any>;
 
 export type {
-  FullTextDocument,
+  LegalDocsQuery,
+  RechtspraakQueryParameters,
+  RechtspraakDocument,
+  RechtspraakFullTextDocument,
+  EchrQueryParameters,
+  EchrDocument,
+  EchrFullTextDocument,
   LegalDocsClient,
   LegalDocsClientConfig,
-  LegalDocument,
-  QueryParameters,
 };
+
+export { DocType } from "legal-docs-client";
 
 export { createLegalDocsClient } from "legal-docs-client";
 
