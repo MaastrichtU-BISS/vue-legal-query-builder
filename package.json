@@ -17,9 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
     "build": "vite build && node scripts/copy-types.mjs",
-    "preview": "vite preview",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
