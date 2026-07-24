@@ -19,17 +19,18 @@
 
         <!-- ECHR-specific: Article Fields -->
         <template v-if="formData.selectedDataset === 'ECHR'">
-            <ArticleField label="Articles Violated" fieldName="articleViolated"
-                v-model:value="formData.articleViolatedInput" v-model:isIntersect="formData.articleViolatedIntersect"
-                placeholder="e.g., P1-1, 3, 8" />
+            <ArticleComboBox label="Articles Violated" fieldName="articleViolated"
+                v-model:selected="formData.articleViolated" v-model:isIntersect="formData.articleViolatedIntersect"
+                placeholder="Search for an article (e.g., 6, 8, 10, P1-1)" />
 
-            <ArticleField label="Articles Applied" fieldName="articleApplied"
-                v-model:value="formData.articleAppliedInput" v-model:isIntersect="formData.articleAppliedIntersect"
-                placeholder="e.g., P1-1, 3, 8" />
+            <ArticleComboBox label="Articles Applied" fieldName="articleApplied"
+                v-model:selected="formData.articleApplied" v-model:isIntersect="formData.articleAppliedIntersect"
+                placeholder="Search for an article (e.g., 6, 8, 10, P1-1)" />
 
-            <ArticleField label="Articles Non-Violated" fieldName="articleNonViolated"
-                v-model:value="formData.articleNonViolatedInput"
-                v-model:isIntersect="formData.articleNonViolatedIntersect" placeholder="e.g., P1-1, 3, 8" />
+            <ArticleComboBox label="Articles Non-Violated" fieldName="articleNonViolated"
+                v-model:selected="formData.articleNonViolated"
+                v-model:isIntersect="formData.articleNonViolatedIntersect"
+                placeholder="Search for an article (e.g., 6, 8, 10, P1-1)" />
 
             <TextInput label="Application Numbers (comma-separated)" fieldId="applicationNumber"
                 v-model:value="formData.applicationNumber" placeholder="e.g., 12345/00, 67890/01" />
@@ -190,7 +191,7 @@ import { Search } from 'lucide-vue-next'
 import DatasetSelector from '../blocks/DatasetSelector.vue'
 import KeywordsInput from '../blocks/KeywordsInput.vue'
 import EclisInput from '../blocks/EclisInput.vue'
-import ArticleField from '../blocks/ArticleField.vue'
+import ArticleComboBox from '../blocks/ArticleComboBox.vue'
 import TextInput from '../blocks/TextInput.vue'
 import DateRange from '../blocks/DateRange.vue'
 import NetworkDegrees from '../blocks/NetworkDegrees.vue'

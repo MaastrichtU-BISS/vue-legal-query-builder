@@ -112,6 +112,9 @@ const formData = reactive({
     articleViolatedInput: '',
     articleAppliedInput: '',
     articleNonViolatedInput: '',
+    articleViolated: [] as string[],
+    articleApplied: [] as string[],
+    articleNonViolated: [] as string[],
     articleViolatedIntersect: false,
     articleAppliedIntersect: false,
     articleNonViolatedIntersect: false,
@@ -206,15 +209,24 @@ function parseEchrParams(): EchrQueryParameters {
 
     if (formData.keywords.length > 0) params.keywords = formData.keywords
 
-    if (formData.articleViolatedInput) {
+    if (formData.articleViolated.length > 0) {
+        params.article_violated = formData.articleViolated
+        params.article_violated_mode = formData.articleViolatedIntersect ? 'AND' : 'OR'
+    } else if (formData.articleViolatedInput) {
         params.article_violated = parseList(formData.articleViolatedInput)
         params.article_violated_mode = formData.articleViolatedIntersect ? 'AND' : 'OR'
     }
-    if (formData.articleAppliedInput) {
+    if (formData.articleApplied.length > 0) {
+        params.article_applied = formData.articleApplied
+        params.article_applied_mode = formData.articleAppliedIntersect ? 'AND' : 'OR'
+    } else if (formData.articleAppliedInput) {
         params.article_applied = parseList(formData.articleAppliedInput)
         params.article_applied_mode = formData.articleAppliedIntersect ? 'AND' : 'OR'
     }
-    if (formData.articleNonViolatedInput) {
+    if (formData.articleNonViolated.length > 0) {
+        params.article_non_violated = formData.articleNonViolated
+        params.article_non_violated_mode = formData.articleNonViolatedIntersect ? 'AND' : 'OR'
+    } else if (formData.articleNonViolatedInput) {
         params.article_non_violated = parseList(formData.articleNonViolatedInput)
         params.article_non_violated_mode = formData.articleNonViolatedIntersect ? 'AND' : 'OR'
     }
@@ -344,6 +356,9 @@ const handleReset = () => {
     formData.articleViolatedInput = ''
     formData.articleAppliedInput = ''
     formData.articleNonViolatedInput = ''
+    formData.articleViolated = []
+    formData.articleApplied = []
+    formData.articleNonViolated = []
     formData.articleViolatedIntersect = false
     formData.articleAppliedIntersect = false
     formData.articleNonViolatedIntersect = false
