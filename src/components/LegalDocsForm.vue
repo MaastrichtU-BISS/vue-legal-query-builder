@@ -83,8 +83,9 @@ const formData = reactive({
     reasoning: '',
     // ECHR-specific
     articleViolatedInput: '',
-    articleAppliedInput: '',
-    articleNonViolatedInput: '',
+    articleViolated: [] as string[],
+    articleApplied: [] as string[],
+    articleNonViolated: [] as string[],
     articleViolatedIntersect: false,
     articleAppliedIntersect: false,
     articleNonViolatedIntersect: false,
@@ -143,16 +144,19 @@ function parseParameters(): QueryParameters {
 
     // ECHR-specific fields
     if (formData.selectedDataset === DataSource.ECHR) {
-        if (formData.articleViolatedInput) {
+        if (formData.articleViolated.length > 0) {
+            params.article_violated = formData.articleViolated
+            params.article_violated_mode = formData.articleViolatedIntersect ? 'AND' : 'OR'
+        } else if (formData.articleViolatedInput) {
             params.article_violated = formData.articleViolatedInput.split(',').map(s => s.trim()).filter(s => s)
             params.article_violated_mode = formData.articleViolatedIntersect ? 'AND' : 'OR'
         }
-        if (formData.articleAppliedInput) {
-            params.article_applied = formData.articleAppliedInput.split(',').map(s => s.trim()).filter(s => s)
+        if (formData.articleApplied.length > 0) {
+            params.article_applied = formData.articleApplied
             params.article_applied_mode = formData.articleAppliedIntersect ? 'AND' : 'OR'
         }
-        if (formData.articleNonViolatedInput) {
-            params.article_non_violated = formData.articleNonViolatedInput.split(',').map(s => s.trim()).filter(s => s)
+        if (formData.articleNonViolated.length > 0) {
+            params.article_non_violated = formData.articleNonViolated
             params.article_non_violated_mode = formData.articleNonViolatedIntersect ? 'AND' : 'OR'
         }
         params.articles_mode = formData.articleGlobalIntersect ? 'AND' : 'OR'
@@ -233,8 +237,9 @@ const handleReset = () => {
     formData.engine = 'ES'
     formData.attributesToFetch = 'ALL'
     formData.articleViolatedInput = ''
-    formData.articleAppliedInput = ''
-    formData.articleNonViolatedInput = ''
+    formData.articleViolated = []
+    formData.articleApplied = []
+    formData.articleNonViolated = []
     formData.articleViolatedIntersect = false
     formData.articleAppliedIntersect = false
     formData.articleNonViolatedIntersect = false
