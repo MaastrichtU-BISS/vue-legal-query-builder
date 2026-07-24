@@ -61,13 +61,14 @@
 
                         <!-- Dynamic Block Component (cached to preserve state across steps) -->
                         <div class="block-wrapper">
-                            <KeepAlive>
-                                <component 
+                            <keep-alive>
+                                <component
+                                    v-if="getBlockComponent(block.type)"
                                     :is="getBlockComponent(block.type)"
                                     v-bind="getBlockProps(block)"
                                     :key="`${selectedGoalIndex}-${currentStepIndex}-${index}`"
                                 />
-                            </KeepAlive>
+                            </keep-alive>
                         </div>
                     </div>
                 </div>
@@ -107,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineAsyncComponent, KeepAlive } from 'vue'
+import { ref, computed, defineAsyncComponent } from 'vue'
 import { ArrowLeft, ArrowRight, Home, Search } from 'lucide-vue-next'
 import type { GuidedStructure, Step, Goal, Block } from '../types'
 import { BlockType } from '../types'
@@ -126,6 +127,24 @@ import DomainsSelector from '../blocks/DomainsSelector.vue'
 import SelectedLaws from '../blocks/SelectedLaws.vue'
 import DocTypeSelector from '../blocks/DocTypeSelector.vue'
 import ImportanceLevelSelector from '../blocks/ImportanceLevelSelector.vue'
+import TextInput from '../blocks/TextInput.vue'
+import TextAreaInput from '../blocks/TextAreaInput.vue'
+
+const normalizedBlockTypeMap: Record<string, BlockType> = Object.values(BlockType).reduce((acc, value) => {
+    acc[value.toLowerCase().replace(/[\s_-]/g, '')] = value
+    return acc
+}, {} as Record<string, BlockType>)
+
+function normalizeBlockType(blockType: BlockType | string): BlockType | undefined {
+    if (typeof blockType !== 'string') return undefined
+
+    if ((Object.values(BlockType) as string[]).includes(blockType)) {
+        return blockType as BlockType
+    }
+
+    const normalized = blockType.trim().toLowerCase().replace(/[\s_-]/g, '')
+    return normalizedBlockTypeMap[normalized]
+}
 
 interface Props {
     guidedStructure?: GuidedStructure
@@ -165,8 +184,10 @@ const currentStep = computed((): Step | undefined => {
 })
 
 // Helper to check if a block is filled
-function isBlockFilled(blockType: BlockType, data: any): boolean {
-    switch (blockType) {
+function isBlockFilled(blockType: BlockType | string, data: any): boolean {
+    const normalizedType = normalizeBlockType(blockType)
+
+    switch (normalizedType) {
         case BlockType.KEYWORDS_INPUT:
             return data.keywords && data.keywords.length > 0
         case BlockType.ECLIS_INPUT:
@@ -188,7 +209,7 @@ function isBlockFilled(blockType: BlockType, data: any): boolean {
         case BlockType.DOC_TYPE_SELECTOR:
             return data.decisions || data.opinions
         case BlockType.IMPORTANCE_LEVEL_SELECTOR:
-            return data.importance && data.importance.length > 0
+            return typeof data.importance === 'number'
         default:
             return false
     }
@@ -237,6 +258,16 @@ const goBackToGoals = () => {
 const selectGoal = (index: number) => {
     selectedGoalIndex.value = index
     currentStepIndex.value = 0
+
+    const goal = props.guidedStructure?.goals[index]
+
+    // Pin the dataset for this goal, if declared. A DATASET_SELECTOR block in its steps can still change it afterwards.
+    if (goal?.dataset) {
+        props.formData.selectedDataset = goal.dataset
+    }
+
+    // Persist hidden fixed parameters for the selected goal so parent parsing can merge them.
+    props.formData.guidedFixedParameters = goal?.fixedParameters || {}
 }
 
 const previousStep = () => {
@@ -263,7 +294,7 @@ const handleSubmit = () => {
     emit('submit', isValid.value)
 }
 
-const getBlockComponent = (blockType: BlockType) => {
+const getBlockComponent = (blockType: BlockType | string) => {
     const componentMap: Record<BlockType, any> = {
         [BlockType.ARTICLE_FIELD]: ArticleField,
         [BlockType.DATASET_SELECTOR]: DatasetSelector,
@@ -278,14 +309,23 @@ const getBlockComponent = (blockType: BlockType) => {
         [BlockType.SELECTED_LAWS]: SelectedLaws,
         [BlockType.FACTS_INPUT]: FactsInput,
         [BlockType.REASONING_INPUT]: ReasoningInput,
+        [BlockType.TEXT_INPUT]: TextInput,
+        [BlockType.TEXTAREA_INPUT]: TextAreaInput,
     }
-    return componentMap[blockType]
+
+    const normalizedType = normalizeBlockType(blockType)
+    if (!normalizedType) return undefined
+
+    return componentMap[normalizedType]
 }
 
 const getBlockProps = (block: Block): any => {
     const baseProps: any = {}
 
-    switch (block.type) {
+    const normalizedType = normalizeBlockType(block.type)
+    if (!normalizedType) return baseProps
+
+    switch (normalizedType) {
         case BlockType.ARTICLE_FIELD:
             return {
                 ...baseProps,
@@ -338,7 +378,7 @@ const getBlockProps = (block: Block): any => {
             return {
                 ...baseProps,
                 importance: props.formData.importance,
-                'onUpdate:importance': (val: number[]) => { props.formData.importance = val }
+                'onUpdate:importance': (val: number | undefined) => { props.formData.importance = val }
             }
 
         case BlockType.INSTANCES_SELECTOR:

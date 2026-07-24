@@ -2,7 +2,7 @@
     <form @submit.prevent="handleSubmit" class="form-container">
         <DatasetSelector v-model:selectedDataset="formData.selectedDataset" />
 
-        <SelectedLaws v-if="formData.selectedDataset === DataSource.RS" :required="true" label="Law Articles"
+        <SelectedLaws v-if="formData.selectedDataset === 'RS'" :required="true" label="Law Articles"
             v-model:selectedLaws="formData.selectedLaws" />
 
         <KeywordsInput label="Keywords" :required="true" v-model:keywords="formData.keywords"
@@ -11,38 +11,39 @@
         <EclisInput label="ECLIS" :required="true" v-model:eclis="formData.eclis" />
 
         <!-- Law References (hidden for now) -->
-        <div v-if="false && formData.selectedDataset === DataSource.RS" class="form-group">
+        <div v-if="false && formData.selectedDataset === 'RS'" class="form-group">
             <label>Law References</label>
             <textarea v-model="formData.articles" placeholder="Enter law articles (e.g., Art. 6:162 BW)"
                 rows="2"></textarea>
         </div>
 
         <!-- ECHR-specific: Article Fields -->
-        <template v-if="formData.selectedDataset === DataSource.ECHR">
-            <ArticleComboBox label="Articles Violated" fieldName="articleViolated"
-                v-model:selected="formData.articleViolated" v-model:isIntersect="formData.articleViolatedIntersect"
-                placeholder="Search for an article (e.g., 6, 8, 10, P1-1)" />
+        <template v-if="formData.selectedDataset === 'ECHR'">
+            <ArticleField label="Articles Violated" fieldName="articleViolated"
+                v-model:value="formData.articleViolatedInput" v-model:isIntersect="formData.articleViolatedIntersect"
+                placeholder="e.g., P1-1, 3, 8" />
 
-            <ArticleComboBox label="Articles Applied" fieldName="articleApplied"
-                v-model:selected="formData.articleApplied" v-model:isIntersect="formData.articleAppliedIntersect"
-                placeholder="Search for an article (e.g., 6, 8, 10, P1-1)" />
+            <ArticleField label="Articles Applied" fieldName="articleApplied"
+                v-model:value="formData.articleAppliedInput" v-model:isIntersect="formData.articleAppliedIntersect"
+                placeholder="e.g., P1-1, 3, 8" />
 
-            <ArticleComboBox label="Articles Non-Violated" fieldName="articleNonViolated"
-                v-model:selected="formData.articleNonViolated"
-                v-model:isIntersect="formData.articleNonViolatedIntersect"
-                placeholder="Search for an article (e.g., 6, 8, 10, P1-1)" />
+            <ArticleField label="Articles Non-Violated" fieldName="articleNonViolated"
+                v-model:value="formData.articleNonViolatedInput"
+                v-model:isIntersect="formData.articleNonViolatedIntersect" placeholder="e.g., P1-1, 3, 8" />
 
             <TextInput label="Application Numbers (comma-separated)" fieldId="applicationNumber"
                 v-model:value="formData.applicationNumber" placeholder="e.g., 12345/00, 67890/01" />
 
             <TextInput label="Respondent State (comma-separated)" fieldId="respondentState"
                 v-model:value="formData.respondentStateInput" placeholder="e.g., NLD, FRA, DEU" />
+
+            <EchrDocTypeSelector v-model:selectedValues="formData.echrDocTypes" />
         </template>
 
-        <InstancesSelector v-if="formData.selectedDataset === DataSource.RS"
+        <InstancesSelector v-if="formData.selectedDataset === 'RS'"
             v-model:selectedValues="formData.selectedInstances" />
 
-        <DomainsSelector v-if="formData.selectedDataset === DataSource.RS"
+        <DomainsSelector v-if="formData.selectedDataset === 'RS'"
             v-model:selectedValues="formData.selectedDomains" />
 
         <!-- Advanced Settings Toggle -->
@@ -54,16 +55,55 @@
 
         <!-- Advanced Settings -->
         <template v-if="showAdvanced">
-            <DateRange v-model:dateStart="formData.dateStart" v-model:dateEnd="formData.dateEnd" />
+            <DateRange v-if="formData.selectedDataset === 'RS'" v-model:dateStart="formData.dateStart"
+                v-model:dateEnd="formData.dateEnd" />
 
             <NetworkDegrees v-model:degreesSource="formData.degreesSource"
                 v-model:degreesTarget="formData.degreesTarget" />
 
-            <DocTypeSelector v-if="formData.selectedDataset === DataSource.RS" v-model:decisions="formData.decisions"
-                v-model:opinions="formData.opinions" />
+            <!-- Rechtspraak Advanced -->
+            <template v-if="formData.selectedDataset === 'RS'">
+                <DocTypeSelector v-model:decisions="formData.decisions" v-model:opinions="formData.opinions" />
+
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="datePublishedStart">Published Start</label>
+                        <input id="datePublishedStart" v-model="formData.datePublishedStart" type="date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="datePublishedEnd">Published End</label>
+                        <input id="datePublishedEnd" v-model="formData.datePublishedEnd" type="date" />
+                    </div>
+                </div>
+
+                <TextInput label="Procedure Types (comma-separated)" fieldId="procedureTypes"
+                    v-model:value="formData.procedureTypesInput" placeholder="e.g., Eerste aanleg, Hoger beroep" />
+
+                <TextInput label="Languages (comma-separated)" fieldId="languages"
+                    v-model:value="formData.languagesInput" placeholder="e.g., nl, en" />
+
+                <TextInput label="Jurisdiction Countries (comma-separated)" fieldId="jurisdictionCountries"
+                    v-model:value="formData.jurisdictionCountriesInput" placeholder="e.g., NL" />
+
+                <TextInput label="Case Numbers / Zaaknummers (comma-separated)" fieldId="zaaknummers"
+                    v-model:value="formData.zaaknummersInput" placeholder="e.g., 12/345678-90" />
+
+                <TextInput label="BWB Resources (comma-separated)" fieldId="bwbResources"
+                    v-model:value="formData.bwbResourcesInput" placeholder="e.g., BWBR0005537" />
+
+                <TextInput label="Journal Abbreviations (comma-separated)" fieldId="journalAbbrs"
+                    v-model:value="formData.journalAbbrsInput" placeholder="e.g., NJ, JAR" />
+
+                <TextInput label="Relation Types (comma-separated)" fieldId="relationTypes"
+                    v-model:value="formData.relationTypesInput" placeholder="e.g., voorziening, herziening" />
+
+                <EdgeSourcesSelector v-model:selectedValues="formData.edgeSources" />
+
+                <OpendataStatusSelector v-model:selectedValue="formData.includeDepublicated" />
+            </template>
 
             <!-- ECHR Advanced -->
-            <template v-if="formData.selectedDataset === DataSource.ECHR">
+            <template v-if="formData.selectedDataset === 'ECHR'">
                 <!-- Global Article Intersect -->
                 <div class="form-group">
                     <div class="label-with-toggle">
@@ -85,7 +125,50 @@
 
                 <!-- Importance Levels -->
                 <ImportanceLevelSelector v-model:importance="formData.importance" />
+
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="dateJudgmentStart">Judgment Date Start</label>
+                        <input id="dateJudgmentStart" v-model="formData.dateJudgmentStart" type="date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="dateJudgmentEnd">Judgment Date End</label>
+                        <input id="dateJudgmentEnd" v-model="formData.dateJudgmentEnd" type="date" />
+                    </div>
+                </div>
+
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="dateDecisionStart">Decision Date Start</label>
+                        <input id="dateDecisionStart" v-model="formData.dateDecisionStart" type="date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="dateDecisionEnd">Decision Date End</label>
+                        <input id="dateDecisionEnd" v-model="formData.dateDecisionEnd" type="date" />
+                    </div>
+                </div>
             </template>
+
+            <!-- Shared pagination / result-shape settings -->
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="pageSize">Page Size</label>
+                    <input id="pageSize" :value="formData.pageSize"
+                        @input="formData.pageSize = ($event.target as HTMLInputElement).value ? parseInt(($event.target as HTMLInputElement).value) : undefined"
+                        type="number" min="1" />
+                </div>
+                <div class="form-group">
+                    <label for="cursor">Pagination Cursor</label>
+                    <input id="cursor" v-model="formData.cursor" type="text" placeholder="Leave empty to start from the first page" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" v-model="formData.onlyCaseIds" />
+                    Only return case IDs
+                </label>
+            </div>
         </template>
 
         <!-- Action Buttons -->
@@ -103,12 +186,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { DataSource } from 'legal-docs-client'
 import { Search } from 'lucide-vue-next'
 import DatasetSelector from '../blocks/DatasetSelector.vue'
 import KeywordsInput from '../blocks/KeywordsInput.vue'
 import EclisInput from '../blocks/EclisInput.vue'
-import ArticleComboBox from '../blocks/ArticleComboBox.vue'
+import ArticleField from '../blocks/ArticleField.vue'
 import TextInput from '../blocks/TextInput.vue'
 import DateRange from '../blocks/DateRange.vue'
 import NetworkDegrees from '../blocks/NetworkDegrees.vue'
@@ -117,6 +199,9 @@ import DomainsSelector from '../blocks/DomainsSelector.vue'
 import SelectedLaws from '../blocks/SelectedLaws.vue'
 import DocTypeSelector from '../blocks/DocTypeSelector.vue'
 import ImportanceLevelSelector from '../blocks/ImportanceLevelSelector.vue'
+import EchrDocTypeSelector from '../blocks/EchrDocTypeSelector.vue'
+import EdgeSourcesSelector from '../blocks/EdgeSourcesSelector.vue'
+import OpendataStatusSelector from '../blocks/OpendataStatusSelector.vue'
 
 const props = defineProps<{
     formData: any
@@ -227,6 +312,21 @@ const handleSubmit = () => {
     color: #666;
     margin: 8px 0 0 0;
     font-style: italic;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
 }
 
 @media (max-width: 640px) {

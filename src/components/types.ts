@@ -1,4 +1,4 @@
-import type { QueryParameters } from 'legal-docs-client'
+import type { RechtspraakQueryParameters, EchrQueryParameters } from 'legal-docs-client'
 
 export enum FormType {
   FREE = 'free',
@@ -19,7 +19,12 @@ export enum BlockType {
   NETWORK_DEGREES = 'NetworkDegrees',
   REASONING_INPUT = 'ReasoningInput',
   SELECTED_LAWS = 'SelectedLaws',
+  TEXT_INPUT = 'TextInput',
+  TEXTAREA_INPUT = 'TextAreaInput',
 }
+
+/** Dataset a query targets. CJEU has no backing endpoint in legal-docs-client yet and stays disabled in the UI. */
+export type Dataset = 'RS' | 'ECHR' | 'CJEU'
 
 export interface Block {
   type: BlockType
@@ -34,10 +39,16 @@ export interface Step {
   blocks: Block[]
 }
 
+/** Shared subset of both query shapes; overlapping field names have compatible types across the two APIs. */
+export type GoalFixedParameters = Partial<RechtspraakQueryParameters> & Partial<EchrQueryParameters>
+
 export interface Goal {
   title: string
   description: string
   icon?: string
+  /** Dataset this goal queries. Applied when the goal is selected, same as fixedParameters; a DATASET_SELECTOR block in its steps can still change it afterwards. */
+  dataset?: Dataset
+  fixedParameters?: GoalFixedParameters
   steps: Step[]
 }
 
@@ -45,11 +56,15 @@ export interface GuidedStructure {
   goals: Goal[]
 }
 
+/** Discriminated union so a host app knows which client method to call with `params`. */
+export type LegalDocsQuery =
+  | { dataset: 'RS'; params: RechtspraakQueryParameters }
+  | { dataset: 'ECHR'; params: EchrQueryParameters }
+
 export interface LegalDocsFormProps {
   title?: string
   subtitle?: string
   type?: FormType
   guidedStructure?: GuidedStructure
-  onSubmit?: (data: QueryParameters) => Promise<any>
+  onSubmit?: (data: LegalDocsQuery) => Promise<any>
 }
-

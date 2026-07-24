@@ -1,6 +1,6 @@
 {
   "name": "vue-legal-query-builder",
-  "version": "0.2.4",
+  "version": "1.0.2",
   "description": "A Vue 3 component for building legal document search queries with hierarchical filtering options",
   "main": "./dist/vue-legal-query-builder.umd.js",
   "module": "./dist/vue-legal-query-builder.es.js",
@@ -17,9 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build && tsc --declaration --emitDeclarationOnly --outDir dist",
-    "preview": "vite preview",
+    "build": "vite build && node scripts/copy-types.mjs",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -47,7 +45,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "legal-docs-client": "^0.2.5",
+    "legal-docs-client": "^1.0.0",
     "lucide-vue-next": "^1.0.0"
   },
   "peerDependencies": {

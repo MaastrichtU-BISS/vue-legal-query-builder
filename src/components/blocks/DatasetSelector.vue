@@ -2,16 +2,16 @@
     <div class="form-group">
         <label>Dataset</label>
         <div class="button-group">
-            <button type="button" @click="selectedDataset = DataSource.RS"
-                :class="{ 'active': selectedDataset === DataSource.RS }">
+            <button type="button" @click="selectedDataset = 'RS'"
+                :class="{ 'active': selectedDataset === 'RS' }">
                 Rechtspraak
             </button>
-            <button type="button" @click="selectedDataset = DataSource.ECHR" disabled
-                :class="{ 'active': selectedDataset === DataSource.ECHR }">
+            <button type="button" @click="selectedDataset = 'ECHR'"
+                :class="{ 'active': selectedDataset === 'ECHR' }">
                 ECHR
             </button>
             <button type="button" disabled
-                :class="{ 'active': selectedDataset === DataSource.CJEU }">
+                :class="{ 'active': selectedDataset === 'CJEU' }">
                 CJEU
             </button>
         </div>
@@ -19,9 +19,9 @@
 </template>
 
 <script setup lang="ts">
-import { DataSource } from 'legal-docs-client'
+import type { Dataset } from '../types'
 
-const selectedDataset = defineModel<DataSource>('selectedDataset')
+const selectedDataset = defineModel<Dataset>('selectedDataset')
 </script>
 
 <style>

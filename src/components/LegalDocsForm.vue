@@ -43,9 +43,16 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import type { QueryParameters } from 'legal-docs-client'
-import { DataSource, DocType } from 'legal-docs-client'
-import type { LegalDocsFormProps } from './types'
+import { DocType } from 'legal-docs-client'
+import type {
+    RechtspraakQueryParameters,
+    EchrQueryParameters,
+    RechtspraakEdgeSource,
+    OpendataStatusFilter,
+    EchrDocumentType,
+    AttributesToFetch,
+} from 'legal-docs-client'
+import type { LegalDocsFormProps, Dataset, LegalDocsQuery, GoalFixedParameters } from './types'
 import { FormType } from './types'
 import FreeForm from './forms/FreeForm.vue'
 import GuidedForm from './forms/GuidedForm.vue'
@@ -55,14 +62,14 @@ const props = withDefaults(defineProps<LegalDocsFormProps>(), {
 })
 
 const emit = defineEmits<{
-    submit: [data: QueryParameters]
+    submit: [data: LegalDocsQuery]
     success: [result: any]
     error: [error: Error]
 }>()
 
 // Form data
 const formData = reactive({
-    selectedDataset: DataSource.RS,
+    selectedDataset: 'RS' as Dataset,
     keywords: [] as string[],
     eclis: '',
     articles: '',
@@ -76,16 +83,35 @@ const formData = reactive({
     dateEnd: new Date().toISOString().split('T')[0],
     decisions: true,
     opinions: false,
-    engine: 'ES',
-    attributesToFetch: 'ALL',
-    // Similarity Search fields
+    attributesToFetch: 'ALL' as AttributesToFetch,
+    // Similarity Search fields. Not part of the published RechtspraakQueryParameters/EchrQueryParameters
+    // types, but still merged into the submitted params as a best-effort passthrough.
     facts: '',
     reasoning: '',
+    guidedFixedParameters: {} as GoalFixedParameters,
+
+    // Rechtspraak-specific advanced fields (comma-separated raw inputs, parsed on submit)
+    procedureTypesInput: '',
+    languagesInput: '',
+    jurisdictionCountriesInput: '',
+    zaaknummersInput: '',
+    bwbResourcesInput: '',
+    journalAbbrsInput: '',
+    relationTypesInput: '',
+    edgeSources: [] as RechtspraakEdgeSource[],
+    includeDepublicated: undefined as OpendataStatusFilter | undefined,
+    datePublishedStart: '',
+    datePublishedEnd: '',
+
+    // Shared pagination / result-shape fields
+    onlyCaseIds: false,
+    pageSize: undefined as number | undefined,
+    cursor: '',
+
     // ECHR-specific
     articleViolatedInput: '',
-    articleViolated: [] as string[],
-    articleApplied: [] as string[],
-    articleNonViolated: [] as string[],
+    articleAppliedInput: '',
+    articleNonViolatedInput: '',
     articleViolatedIntersect: false,
     articleAppliedIntersect: false,
     articleNonViolatedIntersect: false,
@@ -93,89 +119,149 @@ const formData = reactive({
     applicationNumber: '',
     respondentStateInput: '',
     languageInput: '',
-    importance: [] as number[]
+    importance: undefined as number | undefined,
+    echrDocTypes: [] as EchrDocumentType[],
+    dateJudgmentStart: '',
+    dateJudgmentEnd: '',
+    dateDecisionStart: '',
+    dateDecisionEnd: ''
 })
 
 const loading = ref(false)
 const error = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const hasValidationWarning = ref(false)
-function parseParameters(): QueryParameters {
-    const doctypes: DocType[] = []
-    if (formData.decisions) doctypes.push(DocType.DEC)
-    if (formData.opinions) doctypes.push(DocType.OPI)
 
-    const params: QueryParameters = {
-        dataSources: [formData.selectedDataset],
+const parseList = (input: string): string[] | undefined => {
+    const items = input.split(',').map(i => i.trim()).filter(i => i.length > 0)
+    return items.length > 0 ? items : undefined
+}
+
+function parseRechtspraakParams(): RechtspraakQueryParameters {
+    const docTypes: DocType[] = []
+    if (formData.decisions) docTypes.push(DocType.DEC)
+    if (formData.opinions) docTypes.push(DocType.OPI)
+
+    const params: RechtspraakQueryParameters = {
         degreesSource: formData.degreesSource,
         degreesTarget: formData.degreesTarget,
         dateStart: formData.dateStart,
         dateEnd: formData.dateEnd,
-        docTypes: doctypes,
-        engine: formData.engine,
+        docTypes,
         attributesToFetch: formData.attributesToFetch
     }
+
+    const eclis = parseList(formData.eclis)
+    if (eclis) params.eclis = eclis
 
     if (formData.keywords.length > 0) params.keywords = formData.keywords
     if (formData.articles) params.articles = formData.articles
     if (formData.selectedLaws.length > 0) params.selectedLaws = formData.selectedLaws
     if (formData.selectedLawsIntersect !== undefined) params.selectedLawsIntersect = formData.selectedLawsIntersect
-    if (formData.facts) params.facts = formData.facts
-    if (formData.reasoning) params.reasoning = formData.reasoning
+    if (formData.selectedInstances.length > 0) params.instances = formData.selectedInstances
+    if (formData.selectedDomains.length > 0) params.domains = formData.selectedDomains
 
-    // Parse ECLIs
-    if (formData.eclis) {
-        const eclisArray = formData.eclis
-            .split(',')
-            .map(i => i.trim())
-            .filter(i => i.length > 0)
-        if (eclisArray.length > 0) params.eclis = eclisArray
-    }
+    const procedureTypes = parseList(formData.procedureTypesInput)
+    if (procedureTypes) params.procedureTypes = procedureTypes
 
-    // Parse Instances
-    if (formData.selectedInstances.length > 0) {
-        params.instances = formData.selectedInstances
-    }
+    const languages = parseList(formData.languagesInput)
+    if (languages) params.languages = languages
 
-    // Parse Domains
-    if (formData.selectedDomains.length > 0) {
-        params.domains = formData.selectedDomains
-    }
+    const jurisdictionCountries = parseList(formData.jurisdictionCountriesInput)
+    if (jurisdictionCountries) params.jurisdictionCountries = jurisdictionCountries
 
-    // ECHR-specific fields
-    if (formData.selectedDataset === DataSource.ECHR) {
-        if (formData.articleViolated.length > 0) {
-            params.article_violated = formData.articleViolated
-            params.article_violated_mode = formData.articleViolatedIntersect ? 'AND' : 'OR'
-        } else if (formData.articleViolatedInput) {
-            params.article_violated = formData.articleViolatedInput.split(',').map(s => s.trim()).filter(s => s)
-            params.article_violated_mode = formData.articleViolatedIntersect ? 'AND' : 'OR'
-        }
-        if (formData.articleApplied.length > 0) {
-            params.article_applied = formData.articleApplied
-            params.article_applied_mode = formData.articleAppliedIntersect ? 'AND' : 'OR'
-        }
-        if (formData.articleNonViolated.length > 0) {
-            params.article_non_violated = formData.articleNonViolated
-            params.article_non_violated_mode = formData.articleNonViolatedIntersect ? 'AND' : 'OR'
-        }
-        params.articles_mode = formData.articleGlobalIntersect ? 'AND' : 'OR'
+    const zaaknummers = parseList(formData.zaaknummersInput)
+    if (zaaknummers) params.zaaknummers = zaaknummers
 
-        if (formData.applicationNumber) {
-            params.application_number = formData.applicationNumber.split(',').map(s => s.trim()).filter(s => s)
-        }
-        if (formData.respondentStateInput) {
-            params.respondent_state = formData.respondentStateInput.split(',').map(s => s.trim()).filter(s => s)
-        }
-        if (formData.languageInput) {
-            params.language = formData.languageInput.split(',').map(s => s.trim()).filter(s => s)
-        }
-        if (formData.importance.length > 0) {
-            params.importance = formData.importance
-        }
-    }
+    const bwbResources = parseList(formData.bwbResourcesInput)
+    if (bwbResources) params.bwbResources = bwbResources
+
+    const journalAbbrs = parseList(formData.journalAbbrsInput)
+    if (journalAbbrs) params.journalAbbrs = journalAbbrs
+
+    const relationTypes = parseList(formData.relationTypesInput)
+    if (relationTypes) params.relationTypes = relationTypes
+
+    if (formData.edgeSources.length > 0) params.edgeSources = formData.edgeSources
+    if (formData.includeDepublicated) params.includeDepublicated = formData.includeDepublicated
+    if (formData.datePublishedStart) params.datePublishedStart = formData.datePublishedStart
+    if (formData.datePublishedEnd) params.datePublishedEnd = formData.datePublishedEnd
+
+    if (formData.onlyCaseIds) params.onlyCaseIds = formData.onlyCaseIds
+    if (formData.pageSize) params.pageSize = formData.pageSize
+    if (formData.cursor) params.cursor = formData.cursor
 
     return params
+}
+
+function parseEchrParams(): EchrQueryParameters {
+    const params: EchrQueryParameters = {
+        degreesSource: formData.degreesSource,
+        degreesTarget: formData.degreesTarget,
+        attributesToFetch: formData.attributesToFetch
+    }
+
+    const ecli = parseList(formData.eclis)
+    if (ecli) params.ecli = ecli
+
+    if (formData.keywords.length > 0) params.keywords = formData.keywords
+
+    if (formData.articleViolatedInput) {
+        params.article_violated = parseList(formData.articleViolatedInput)
+        params.article_violated_mode = formData.articleViolatedIntersect ? 'AND' : 'OR'
+    }
+    if (formData.articleAppliedInput) {
+        params.article_applied = parseList(formData.articleAppliedInput)
+        params.article_applied_mode = formData.articleAppliedIntersect ? 'AND' : 'OR'
+    }
+    if (formData.articleNonViolatedInput) {
+        params.article_non_violated = parseList(formData.articleNonViolatedInput)
+        params.article_non_violated_mode = formData.articleNonViolatedIntersect ? 'AND' : 'OR'
+    }
+    params.articles_mode = formData.articleGlobalIntersect ? 'AND' : 'OR'
+
+    const applicationNumbers = parseList(formData.applicationNumber)
+    if (applicationNumbers) params.application_number = applicationNumbers
+
+    const respondentStates = parseList(formData.respondentStateInput)
+    if (respondentStates) params.respondent_state = respondentStates
+
+    const languages = parseList(formData.languageInput)
+    if (languages) params.language = languages
+
+    if (formData.importance !== undefined) params.importance = formData.importance
+    if (formData.echrDocTypes.length > 0) params.document_type = formData.echrDocTypes
+
+    if (formData.dateJudgmentStart) params.date_judgment_start = formData.dateJudgmentStart
+    if (formData.dateJudgmentEnd) params.date_judgment_end = formData.dateJudgmentEnd
+    if (formData.dateDecisionStart) params.date_decision_start = formData.dateDecisionStart
+    if (formData.dateDecisionEnd) params.date_decision_end = formData.dateDecisionEnd
+
+    if (formData.onlyCaseIds) params.onlyCaseIds = formData.onlyCaseIds
+    if (formData.pageSize) params.pageSize = formData.pageSize
+    if (formData.cursor) params.cursor = formData.cursor
+
+    return params
+}
+
+function parseParameters(): LegalDocsQuery {
+    // facts/reasoning aren't declared on either query type in legal-docs-client, but are merged
+    // in anyway as a best-effort passthrough in case the API still accepts them.
+    const passthrough: Record<string, string> = {}
+    if (formData.facts) passthrough.facts = formData.facts
+    if (formData.reasoning) passthrough.reasoning = formData.reasoning
+
+    if (formData.selectedDataset === 'ECHR') {
+        return {
+            dataset: 'ECHR',
+            params: { ...parseEchrParams(), ...passthrough, ...formData.guidedFixedParameters } as EchrQueryParameters
+        }
+    }
+
+    return {
+        dataset: 'RS',
+        params: { ...parseRechtspraakParams(), ...passthrough, ...formData.guidedFixedParameters } as RechtspraakQueryParameters
+    }
 }
 
 const handleSubmit = async (isValid: boolean) => {
@@ -220,7 +306,7 @@ const handleSubmit = async (isValid: boolean) => {
 }
 
 const handleReset = () => {
-    formData.selectedDataset = DataSource.RS
+    formData.selectedDataset = 'RS'
     formData.keywords = []
     formData.eclis = ''
     formData.articles = ''
@@ -234,12 +320,30 @@ const handleReset = () => {
     formData.dateEnd = new Date().toISOString().split('T')[0]
     formData.decisions = true
     formData.opinions = false
-    formData.engine = 'ES'
     formData.attributesToFetch = 'ALL'
+    formData.facts = ''
+    formData.reasoning = ''
+    formData.guidedFixedParameters = {}
+
+    formData.procedureTypesInput = ''
+    formData.languagesInput = ''
+    formData.jurisdictionCountriesInput = ''
+    formData.zaaknummersInput = ''
+    formData.bwbResourcesInput = ''
+    formData.journalAbbrsInput = ''
+    formData.relationTypesInput = ''
+    formData.edgeSources = []
+    formData.includeDepublicated = undefined
+    formData.datePublishedStart = ''
+    formData.datePublishedEnd = ''
+
+    formData.onlyCaseIds = false
+    formData.pageSize = undefined
+    formData.cursor = ''
+
     formData.articleViolatedInput = ''
-    formData.articleViolated = []
-    formData.articleApplied = []
-    formData.articleNonViolated = []
+    formData.articleAppliedInput = ''
+    formData.articleNonViolatedInput = ''
     formData.articleViolatedIntersect = false
     formData.articleAppliedIntersect = false
     formData.articleNonViolatedIntersect = false
@@ -247,7 +351,12 @@ const handleReset = () => {
     formData.applicationNumber = ''
     formData.respondentStateInput = ''
     formData.languageInput = ''
-    formData.importance = []
+    formData.importance = undefined
+    formData.echrDocTypes = []
+    formData.dateJudgmentStart = ''
+    formData.dateJudgmentEnd = ''
+    formData.dateDecisionStart = ''
+    formData.dateDecisionEnd = ''
     clearMessages()
 }
 

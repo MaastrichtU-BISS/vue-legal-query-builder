@@ -3,24 +3,31 @@ import type { App, Plugin } from "vue";
 // Export components
 import LegalDocsForm from "./components/LegalDocsForm.vue";
 export { LegalDocsForm };
-export type { LegalDocsFormProps } from "./components/types";
-export { FormType } from "./components/types";
+export type { LegalDocsFormProps, Dataset, LegalDocsQuery, Goal, GoalFixedParameters, GuidedStructure, Step, Block } from "./components/types";
+export { FormType, BlockType } from "./components/types";
 
 // Explicitly import and re-export types from legal-docs-client
 import type {
   LegalDocsClient,
-  QueryParameters,
-  LegalDocument,
-  FullTextDocument,
+  RechtspraakQueryParameters,
+  RechtspraakDocument,
+  RechtspraakFullTextDocument,
+  EchrQueryParameters,
+  EchrDocument,
+  EchrFullTextDocument,
   LegalDocsClientConfig,
 } from "legal-docs-client";
 export type {
   LegalDocsClient,
-  QueryParameters,
-  LegalDocument,
-  FullTextDocument,
+  RechtspraakQueryParameters,
+  RechtspraakDocument,
+  RechtspraakFullTextDocument,
+  EchrQueryParameters,
+  EchrDocument,
+  EchrFullTextDocument,
   LegalDocsClientConfig,
 };
+export { DocType } from "legal-docs-client";
 
 // Explicitly import and re-export key exports
 import { createLegalDocsClient } from "legal-docs-client";
