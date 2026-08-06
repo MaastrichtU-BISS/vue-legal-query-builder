@@ -11,7 +11,7 @@
       "require": "./dist/vue-legal-query-builder.umd.js",
       "types": "./dist/index.d.ts"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/vue-legal-query-builder.css"
   },
   "files": [
     "dist"
