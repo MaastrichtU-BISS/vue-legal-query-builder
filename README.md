@@ -12,7 +12,8 @@ npm install vue-legal-query-builder
 
 ```vue
 <template>
-  <LegalDocsForm 
+  <LegalDocsForm
+    :client-config="{ baseURL: '/api/legal-docs' }" 
     title="Search Legal Documents"
     type="free"
     @submit="handleSubmit"
@@ -25,9 +26,9 @@ npm install vue-legal-query-builder
 import { LegalDocsForm, createLegalDocsClient } from 'vue-legal-query-builder'
 import 'vue-legal-query-builder/style.css'
 
-const client = createLegalDocsClient({
-  apiKey: import.meta.env.VITE_CITATIONS_API_KEY,
-})
+// No credential here: requests go to a path your own server forwards to the
+// API, adding the token there. See "API access" below.
+const client = createLegalDocsClient({ baseURL: '/api/legal-docs' })
 
 const handleSubmit = async (query) => {
   // `query` is a discriminated union: { dataset: 'RS', params } | { dataset: 'ECHR', params }
@@ -47,27 +48,46 @@ const handleError = (error) => {
 </script>
 ```
 
-## Required API Token
+## API access
 
-This package requires an API token for document requests.
+Searching needs an access token for the Case Law Explorer API. New keys are
+generated at:
+https://api.caselawexplorer.tech/login.html?next=/account.html
 
-1. Create a `.env` (or `.env.local`) file in your project root.
-2. Add your token with a Vite-compatible variable name:
+**Do not put that token in browser code.** A page's JavaScript is readable by
+anyone using it, and a bundler replaces `import.meta.env.VITE_*` with the
+literal value at build time — so a token read that way is compiled into the
+JavaScript you ship.
 
-```env
-VITE_CITATIONS_API_KEY=your_token_here
-```
-
-3. Use it when creating the client:
+Have your own server forward the requests instead, attaching the credential:
 
 ```ts
-const client = createLegalDocsClient({
-  apiKey: import.meta.env.VITE_CITATIONS_API_KEY,
-})
+// In the page: no credential, same-origin path.
+const client = createLegalDocsClient({ baseURL: '/api/legal-docs' })
 ```
 
-New API keys can be generated here:
-https://api.caselawexplorer.tech/login.html?next=/account.html
+```
+// On your server: forward /api/legal-docs/* to
+// https://api.caselawexplorer.tech/api, adding
+//   Authorization: Bearer <CITATIONS_API_KEY>
+```
+
+### clientConfig
+
+Some blocks query the API themselves while the form is being filled in — the
+law search in `SelectedLaws` searches as you type. Pass `clientConfig` so those
+requests go the same way as your own:
+
+```vue
+<LegalDocsForm :client-config="{ baseURL: '/api/legal-docs' }" />
+```
+
+Without it those blocks fall back to the API's default address with no
+credential, and their lookups will fail against a service that requires one.
+
+An `apiKey` may be passed in `clientConfig` where the page is already trusted
+with it — a tool behind a login, or local development — but never in an
+application handed to other people.
 
 ## Datasets
 

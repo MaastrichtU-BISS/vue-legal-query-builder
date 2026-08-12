@@ -1,4 +1,4 @@
-import type { RechtspraakQueryParameters, EchrQueryParameters } from 'legal-docs-client'
+import type { RechtspraakQueryParameters, EchrQueryParameters, LegalDocsClientConfig } from 'legal-docs-client'
 
 export enum FormType {
   FREE = 'free',
@@ -67,4 +67,14 @@ export interface LegalDocsFormProps {
   type?: FormType
   guidedStructure?: GuidedStructure
   onSubmit?: (data: LegalDocsQuery) => Promise<any>
+  /**
+   * How blocks inside the form reach the API for their own lookups, such as
+   * the law search in SelectedLaws.
+   *
+   * Browser hosts should point `baseURL` at a path they proxy and leave
+   * `apiKey` unset, so the credential stays on their server. Passing an
+   * `apiKey` here puts it in the browser, which is only appropriate where the
+   * page is already trusted with it.
+   */
+  clientConfig?: LegalDocsClientConfig
 }

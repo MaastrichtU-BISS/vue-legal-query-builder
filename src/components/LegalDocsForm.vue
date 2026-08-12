@@ -54,12 +54,18 @@ import type {
 } from 'legal-docs-client'
 import type { LegalDocsFormProps, Dataset, LegalDocsQuery, GoalFixedParameters } from './types'
 import { FormType } from './types'
+import { provideClient } from './clientContext'
 import FreeForm from './forms/FreeForm.vue'
 import GuidedForm from './forms/GuidedForm.vue'
 
 const props = withDefaults(defineProps<LegalDocsFormProps>(), {
     type: FormType.FREE
 })
+
+// Blocks that query the API while the form is being filled in get their
+// client from here, so the host controls where those requests go and whether a
+// credential travels with them.
+provideClient(() => props.clientConfig)
 
 const emit = defineEmits<{
     submit: [data: LegalDocsQuery]

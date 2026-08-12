@@ -58,8 +58,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { createLegalDocsClient } from 'legal-docs-client'
 import type { BWBItem } from 'legal-docs-client'
+import { useClient } from '../clientContext'
 
 
 const props = defineProps<{
@@ -69,9 +69,10 @@ const props = defineProps<{
 
 const selectedLaws = defineModel<string[]>('selectedLaws', { default: () => [] })
 
-const client = createLegalDocsClient({
-    apiKey: import.meta.env.VITE_CITATIONS_API_KEY
-})
+// Supplied by LegalDocsForm rather than built here. Reading a token from
+// import.meta.env compiled it into this package's published bundle and into
+// every application that installed it.
+const client = useClient()
 const searchQuery = ref('')
 const loading = ref(false)
 const results = ref<BWBItem[]>([])
