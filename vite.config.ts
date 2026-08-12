@@ -14,11 +14,15 @@ export default defineConfig({
       fileName: (format: string) => `vue-legal-query-builder.${format}.js`
     },
     rollupOptions: {
-      external: ['vue', 'legal-docs-client'],
+      // legal-docs-types is a declared dependency, so it must stay a real
+      // import rather than being copied in here: the package's own .d.ts
+      // files reference it, and a consumer comparing their DocType against a
+      // second copy baked into this bundle should not have to wonder.
+      external: ['vue', 'legal-docs-types'],
       output: {
         globals: {
           vue: 'Vue',
-          'legal-docs-client': 'LegalDocsClient'
+          'legal-docs-types': 'LegalDocsTypes'
         }
       }
     }
