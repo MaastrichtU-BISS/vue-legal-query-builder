@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import type { OpendataStatusFilter } from 'legal-docs-client'
+import type { OpendataStatusFilter } from 'legal-docs-types'
 
 const selectedValue = defineModel<OpendataStatusFilter | undefined>('selectedValue')
 

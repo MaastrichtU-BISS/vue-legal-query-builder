@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { DocType } from 'legal-docs-client'
+import { DocType } from 'legal-docs-types'
 import type {
     RechtspraakQueryParameters,
     EchrQueryParameters,
@@ -51,10 +51,10 @@ import type {
     OpendataStatusFilter,
     EchrDocumentType,
     AttributesToFetch,
-} from 'legal-docs-client'
+} from 'legal-docs-types'
 import type { LegalDocsFormProps, Dataset, LegalDocsQuery, GoalFixedParameters } from './types'
 import { FormType } from './types'
-import { provideClient } from './clientContext'
+import { provideHostCallbacks } from './hostCallbacks'
 import FreeForm from './forms/FreeForm.vue'
 import GuidedForm from './forms/GuidedForm.vue'
 
@@ -62,10 +62,9 @@ const props = withDefaults(defineProps<LegalDocsFormProps>(), {
     type: FormType.FREE
 })
 
-// Blocks that query the API while the form is being filled in get their
-// client from here, so the host controls where those requests go and whether a
-// credential travels with them.
-provideClient(() => props.clientConfig)
+// Blocks that look things up while the form is being filled in ask the host to
+// do it, so no part of this package ever calls the API or holds a credential.
+provideHostCallbacks({ searchLaws: (query) => props.onSearchLaws?.(query) ?? Promise.resolve([]) })
 
 const emit = defineEmits<{
     submit: [data: LegalDocsQuery]
@@ -263,7 +262,7 @@ function parseEchrParams(): EchrQueryParameters {
 }
 
 function parseParameters(): LegalDocsQuery {
-    // facts/reasoning aren't declared on either query type in legal-docs-client, but are merged
+    // facts/reasoning aren't declared on either query type in legal-docs-types, but are merged
     // in anyway as a best-effort passthrough in case the API still accepts them.
     const passthrough: Record<string, string> = {}
     if (formData.facts) passthrough.facts = formData.facts

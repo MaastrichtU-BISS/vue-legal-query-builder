@@ -1,4 +1,4 @@
-import type { RechtspraakQueryParameters, EchrQueryParameters, LegalDocsClientConfig } from 'legal-docs-client'
+import type { RechtspraakQueryParameters, EchrQueryParameters, BWBItem } from 'legal-docs-types'
 
 export enum FormType {
   FREE = 'free',
@@ -23,7 +23,7 @@ export enum BlockType {
   TEXTAREA_INPUT = 'TextAreaInput',
 }
 
-/** Dataset a query targets. CJEU has no backing endpoint in legal-docs-client yet and stays disabled in the UI. */
+/** Dataset a query targets. CJEU has no backing endpoint in the API yet and stays disabled in the UI. */
 export type Dataset = 'RS' | 'ECHR' | 'CJEU'
 
 export interface Block {
@@ -68,13 +68,14 @@ export interface LegalDocsFormProps {
   guidedStructure?: GuidedStructure
   onSubmit?: (data: LegalDocsQuery) => Promise<any>
   /**
-   * How blocks inside the form reach the API for their own lookups, such as
-   * the law search in SelectedLaws.
+   * Searches legislation by name, for the law selector.
    *
-   * Browser hosts should point `baseURL` at a path they proxy and leave
-   * `apiKey` unset, so the credential stays on their server. Passing an
-   * `apiKey` here puts it in the browser, which is only appropriate where the
-   * page is already trusted with it.
+   * The form does not call the API itself — that needs a credential, and a
+   * credential in a page is readable by anyone using it. Point this at your
+   * own server, the same way `onSubmit` is pointed at it.
+   *
+   * Omitting it leaves the law selector telling the user that search is
+   * unavailable, rather than silently returning nothing.
    */
-  clientConfig?: LegalDocsClientConfig
+  onSearchLaws?: (query: string) => Promise<BWBItem[]>
 }

@@ -6,9 +6,11 @@ import type {
   EchrQueryParameters,
   EchrDocument,
   EchrFullTextDocument,
-  LegalDocsClient,
-  LegalDocsClientConfig,
-} from "legal-docs-client";
+  BWBItem,
+} from "legal-docs-types";
+
+/** Searches legislation by name. Supplied by the host. */
+export declare type SearchLaws = (query: string) => Promise<BWBItem[]>;
 
 export declare enum FormType {
   FREE = "free",
@@ -73,24 +75,18 @@ export interface LegalDocsFormProps {
   type?: FormType;
   guidedStructure?: GuidedStructure;
   onSubmit?: (data: LegalDocsQuery) => Promise<any>;
+  /**
+   * Searches legislation by name, for the law selector. The form never calls
+   * the API itself — point this at your own server.
+   */
+  onSearchLaws?: SearchLaws;
 }
 
 export declare const LegalDocsForm: DefineComponent<LegalDocsFormProps, {}, any>;
 
-export type {
-  RechtspraakQueryParameters,
-  RechtspraakDocument,
-  RechtspraakFullTextDocument,
-  EchrQueryParameters,
-  EchrDocument,
-  EchrFullTextDocument,
-  LegalDocsClient,
-  LegalDocsClientConfig,
-};
 
-export { DocType } from "legal-docs-client";
+export { DocType } from "legal-docs-types";
 
-export { createLegalDocsClient } from "legal-docs-client";
 
 export declare const VueLegalQueryBuilderPlugin: Plugin;
 

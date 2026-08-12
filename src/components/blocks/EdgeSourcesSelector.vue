@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import type { RechtspraakEdgeSource } from 'legal-docs-client'
+import type { RechtspraakEdgeSource } from 'legal-docs-types'
 
 const selectedValues = defineModel<RechtspraakEdgeSource[]>('selectedValues', { default: () => [] })
 

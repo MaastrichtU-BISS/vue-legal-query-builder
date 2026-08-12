@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import type { EchrDocumentType } from 'legal-docs-client'
+import type { EchrDocumentType } from 'legal-docs-types'
 
 const selectedValues = defineModel<EchrDocumentType[]>('selectedValues', { default: () => [] })
 

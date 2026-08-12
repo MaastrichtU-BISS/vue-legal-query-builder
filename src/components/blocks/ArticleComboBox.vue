@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ECHR_ARTICLES_OPTIONS } from 'legal-docs-client'
+import { ECHR_ARTICLES_OPTIONS } from 'legal-docs-types'
 
 const selected = defineModel<string[]>('selected', { default: () => [] })
 const isIntersect = defineModel<boolean>('isIntersect')

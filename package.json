@@ -1,7 +1,7 @@
 {
   "name": "vue-legal-query-builder",
   "version": "1.0.6",
-  "description": "A Vue 3 component for building legal document search queries with hierarchical filtering options",
+  "description": "Vue form for building Case Law Explorer queries. Builds queries and never sends them: the host makes the requests, so no credential ever reaches the browser.",
   "main": "./dist/vue-legal-query-builder.umd.js",
   "module": "./dist/vue-legal-query-builder.es.js",
   "types": "./dist/index.d.ts",
@@ -45,7 +45,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "legal-docs-client": "^1.1.1",
+    "legal-docs-types": "file:../legal-docs-types",
     "lucide-vue-next": "^1.0.0"
   },
   "peerDependencies": {

@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { INSTANCES_OPTIONS } from 'legal-docs-client'
+import { INSTANCES_OPTIONS } from 'legal-docs-types'
 
 interface HierarchyItem {
     value: string

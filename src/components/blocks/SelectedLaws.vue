@@ -31,7 +31,13 @@
                     </label>
                 </div>
             </div>
-            <div v-if="!loading && results.length === 0 && searchQuery" class="no-results-message">
+            <div v-if="!searchAvailable" class="no-results-message">
+                Law search is not available in this application.
+            </div>
+            <div
+                v-else-if="!loading && results.length === 0 && searchQuery"
+                class="no-results-message"
+            >
                 No laws found matching your search
             </div>
         </div>
@@ -58,8 +64,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { BWBItem } from 'legal-docs-client'
-import { useClient } from '../clientContext'
+import type { BWBItem } from 'legal-docs-types'
+import { useHostCallbacks } from '../hostCallbacks'
 
 
 const props = defineProps<{
@@ -69,10 +75,12 @@ const props = defineProps<{
 
 const selectedLaws = defineModel<string[]>('selectedLaws', { default: () => [] })
 
-// Supplied by LegalDocsForm rather than built here. Reading a token from
-// import.meta.env compiled it into this package's published bundle and into
-// every application that installed it.
-const client = useClient()
+// The host does the searching. This package neither calls the API nor holds a
+// credential: an earlier version read a token from import.meta.env, which
+// compiled it into this package's published bundle and into every application
+// that installed it.
+const { searchLaws } = useHostCallbacks()
+const searchAvailable = computed(() => typeof searchLaws === 'function')
 const searchQuery = ref('')
 const loading = ref(false)
 const results = ref<BWBItem[]>([])
@@ -124,11 +132,18 @@ const handleSearch = async () => {
     showResults.value = true
     loading.value = true
 
+    // Nothing to search with: the host did not supply onSearchLaws, and the
+    // template says so rather than leaving a spinner running forever.
+    if (!searchAvailable.value) {
+        loading.value = false
+        results.value = []
+        return
+    }
+
     // Debounce the fetch call
     debounceTimer = setTimeout(async () => {
-        if (!client) return
         try {
-            const data = await client.fetchLaws(query)
+            const data = await searchLaws!(query)
             results.value = data || []
         } catch (error) {
             // Silently ignore errors as per requirement

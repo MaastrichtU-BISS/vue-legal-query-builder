@@ -13,7 +13,7 @@ npm install vue-legal-query-builder
 ```vue
 <template>
   <LegalDocsForm
-    :client-config="{ baseURL: '/api/legal-docs' }" 
+    :on-search-laws="handleSearchLaws" 
     title="Search Legal Documents"
     type="free"
     @submit="handleSubmit"
@@ -23,19 +23,24 @@ npm install vue-legal-query-builder
 </template>
 
 <script setup>
-import { LegalDocsForm, createLegalDocsClient } from 'vue-legal-query-builder'
+import { LegalDocsForm } from 'vue-legal-query-builder'
 import 'vue-legal-query-builder/style.css'
 
-// No credential here: requests go to a path your own server forwards to the
-// API, adding the token there. See "API access" below.
-const client = createLegalDocsClient({ baseURL: '/api/legal-docs' })
-
+// This package never calls the API. Both of these go to your own server,
+// which holds the credential. See "API access" below.
 const handleSubmit = async (query) => {
   // `query` is a discriminated union: { dataset: 'RS', params } | { dataset: 'ECHR', params }
-  const results = query.dataset === 'RS'
-    ? await client.fetchRechtspraak(query.params)
-    : await client.fetchEchr(query.params)
-  return results
+  const res = await fetch('/api/legal-docs/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(query),
+  })
+  return res.json()
+}
+
+const handleSearchLaws = async (text) => {
+  const res = await fetch(`/api/legal-docs/laws?q=${encodeURIComponent(text)}`)
+  return res.json()
 }
 
 const handleSuccess = (data) => {
@@ -50,44 +55,48 @@ const handleError = (error) => {
 
 ## API access
 
-Searching needs an access token for the Case Law Explorer API. New keys are
-generated at:
+**This package never calls the API.** It builds a query and hands it back to
+you; you make the request from your own server.
+
+That is not a limitation, it is the point. Calling the API needs a token, and a
+token in a page is readable by anyone using it — and usable by them to make
+whatever calls they like on your quota. No amount of hiding changes that, so
+this package has no client, imports no HTTP library, and exports no way to
+construct one.
+
+```
+browser ──▶ your server ──▶ Case Law Explorer API
+             (holds the token)
+```
+
+On the server, use [`node-legal-docs-client`](../node-legal-docs-client) for
+TypeScript or [`go-legal-docs-client`](../go-legal-docs-client) for Go. Tokens
+are generated at
 https://api.caselawexplorer.tech/login.html?next=/account.html
 
-**Do not put that token in browser code.** A page's JavaScript is readable by
-anyone using it, and a bundler replaces `import.meta.env.VITE_*` with the
-literal value at build time — so a token read that way is compiled into the
-JavaScript you ship.
+### The two callbacks
 
-Have your own server forward the requests instead, attaching the credential:
+| Prop | Called when | You should |
+|---|---|---|
+| `onSubmit` | the user runs the search | POST the query to your server |
+| `onSearchLaws` | the user types in the law selector | GET matching laws from your server |
 
-```ts
-// In the page: no credential, same-origin path.
-const client = createLegalDocsClient({ baseURL: '/api/legal-docs' })
-```
-
-```
-// On your server: forward /api/legal-docs/* to
-// https://api.caselawexplorer.tech/api, adding
-//   Authorization: Bearer <CITATIONS_API_KEY>
-```
-
-### clientConfig
-
-Some blocks query the API themselves while the form is being filled in — the
-law search in `SelectedLaws` searches as you type. Pass `clientConfig` so those
-requests go the same way as your own:
+`onSearchLaws` is optional. Without it the law selector tells the user that
+search is unavailable, rather than spinning forever or silently finding
+nothing.
 
 ```vue
-<LegalDocsForm :client-config="{ baseURL: '/api/legal-docs' }" />
+<LegalDocsForm
+  :on-submit="handleSubmit"
+  :on-search-laws="handleSearchLaws"
+/>
 ```
 
-Without it those blocks fall back to the API's default address with no
-credential, and their lookups will fail against a service that requires one.
+### Types
 
-An `apiKey` may be passed in `clientConfig` where the page is already trusted
-with it — a tool behind a login, or local development — but never in an
-application handed to other people.
+Request and response shapes come from
+[`legal-docs-types`](../legal-docs-types) and are re-exported here. That
+package has no client either, so it is safe to import anywhere.
 
 ## Datasets
 
