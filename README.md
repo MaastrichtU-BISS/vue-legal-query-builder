@@ -8,6 +8,22 @@ A Vue 3 component library for building legal document search queries. Provides t
 npm install vue-legal-query-builder
 ```
 
+## Development
+
+Checkout this repo and run the watch script in this repo to rebuild the `/dist` folder whenever you make changes in this repo:
+
+```bash
+pnpm watch
+```
+
+To use this local `vue-legal-query-builder` package with another project, make sure `vue-legal-query-builder` and your project are in the same partent folder then add `vue-legal-query-builder` to your project with pnpm's `link:` protocol. In your project, run:
+
+```bash
+pnpm add link:..\vue-legal-query-builder
+```
+
+Keep `pnpm watch` running in `vue-legal-query-builder` while developing. Your project will automatically pick up changes you make in `vue-legal-query-builder`.
+
 ## Quick Start
 
 ```vue
