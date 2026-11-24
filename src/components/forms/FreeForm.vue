@@ -177,7 +177,7 @@
             <button type="button" @click="emit('handleReset')" :disabled="loading" class="btn btn-secondary">
                 Reset
             </button>
-            <button type="submit" :disabled="loading" class="btn btn-primary">
+            <button type="submit" :disabled="loading || !isValid" class="btn btn-primary">
                 <Search :size="16" />
                 {{ loading ? 'Searching...' : 'Search Documents' }}
             </button>
